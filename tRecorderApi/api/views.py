@@ -22,6 +22,7 @@ import time
 import uuid
 import os, glob
 from django.conf import settings
+
 class LanguageViewSet(viewsets.ModelViewSet):
     """This class handles the http GET, PUT and DELETE requests."""
     queryset = Language.objects.all()
@@ -118,12 +119,13 @@ class ProjectViewSet(views.APIView):
         return Response(lst, status=200)
 
 class ProjectZipFiles(views.APIView):
-    parser_classes = (JSONParser,)#
+    parser_classes = (JSONParser,)
     def post(self, request):
-        data = json.loads(request.body)#
+        data = json.loads(request.body)
         lst = []
         wavfiles = []
         takes = Take.objects
+
         #filter the database with the given parameters
         if "language" in data:
             takes = takes.filter(language__slug=data["language"])
@@ -135,28 +137,32 @@ class ProjectZipFiles(views.APIView):
             takes = takes.filter(chapter=data["chapter"])
         if "startv" in data:
             takes = takes.filter(startv=data["startv"])
+
         #create list for locations
         test = []
         lst.append(takes.values())
         for i in lst[0]:
             test.append(i["location"])
-        #Create an empty array of files in the zip
+
         filesInZip = []
+
         #if an export folder in media doesn't exist, create one
         if not os.path.exists(os.path.join(settings.BASE_DIR, 'media/export/')):
             os.makedirs(os.path.join(settings.BASE_DIR, 'media/export/'))
         location = os.path.join(settings.BASE_DIR, 'media/export/')
+
         #use shutil to copy the wav files to a new file
         for loc in test:
             abpath = os.path.join(settings.BASE_DIR, loc)
             shutil.copy2(abpath, location)
+
         #process of renaming/converting to mp3
         for subdir, dirs, files in os.walk(location):
-            # look at all the files
+            
             for file in files:
                 # store the absolute path which is is it's subdir and where the os step is
                 filePath = subdir + os.sep + file
-                # if the file is audio
+
                 if filePath.endswith(".wav") or filePath.endswith(".mp3"):
                     # Add to array so it can be added to the archive
                     inputFile = filePath.title().lower()
@@ -164,20 +170,24 @@ class ProjectZipFiles(views.APIView):
                     fileName = file.title()[:-4].strip().replace(" ","").lower() + ".mp3"
                     sound.export(fileName, format="mp3")
                     filesInZip.append(fileName)
-        #zip up files
+
+        # Creating zip file
         with zipfile.ZipFile('media/export/' + str(randint(0,20)) + 'zipped_file.zip', 'w') as zipped_f:
-            # for all the member in the array of files add them to the zip archive
-            # doing this - this way also preserves exactly the directory location that the files sit in even before the main archive
             for members in filesInZip:
                 zipped_f.write(members)
+
         #delete the newly created mp3 files (files are still in zip)
         filelist = [ f for f in os.listdir(settings.BASE_DIR) if f.endswith(".mp3") ]
+
+        #delete the mp3 files we copied
         for f in filelist:
             os.remove(f)
         directory=os.path.join(settings.BASE_DIR, 'media/export/')
+
         #delete the wav files we copied
         os.chdir(directory)
         files=glob.glob('*.wav')
+
         for filename in files:
             os.remove(filename)
         #currently returns list of the takes we have gathered but this can easily be changed 
@@ -185,11 +195,13 @@ class ProjectZipFiles(views.APIView):
 
 class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser,)
+
     def post(self, request, filename, format='zip'):
         if request.method == 'POST' and request.data['file']:
             uuid_name = str(time.time()) + str(uuid.uuid4())
             upload = request.data["file"]
             #unzip files
+
             try:
                 zip = zipfile.ZipFile(upload)
                 file_name = 'media/dump/' + uuid_name
