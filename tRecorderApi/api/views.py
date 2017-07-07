@@ -10,6 +10,7 @@ from .serializers import LanguageSerializer, BookSerializer, UserSerializer
 from .serializers import TakeSerializer, CommentSerializer
 from .models import Language, Book, User, Take, Comment
 from tinytag import TinyTag
+from pydub import AudioSegment
 import zipfile
 import urllib2
 import pickle
@@ -17,7 +18,7 @@ import json
 import pydub
 import time
 import uuid
-import os
+import os, glob
 
 class LanguageViewSet(viewsets.ModelViewSet):
     """This class handles the http GET, PUT and DELETE requests."""
@@ -70,17 +71,17 @@ class ProjectViewSet(views.APIView):
 
         lst = []
         takes = Take.objects
-        if "language" in data: 
+        if "language" in data:
             takes = takes.filter(language__slug=data["language"])
-        if "version" in data: 
+        if "version" in data:
             takes = takes.filter(version=data["version"])
-        if "book" in data: 
+        if "book" in data:
             takes = takes.filter(book__slug=data["book"])
-        if "chapter" in data: 
+        if "chapter" in data:
             takes = takes.filter(chapter=data["chapter"])
-        if "startv" in data: 
+        if "startv" in data:
             takes = takes.filter(startv=data["startv"])
-        
+
         res = takes.values()
 
         for take in res:
@@ -112,7 +113,69 @@ class ProjectViewSet(views.APIView):
                 take["markers"] = {}
             dic["take"] = take
             lst.append(dic)
+        return Response(lst, status=200)
 
+class ProjectZipFiles(views.APIView):
+    parser_classes = (JSONParser,)#
+    def post(self, request):
+        data = json.loads(request.body)#
+        lst = []
+        wavfiles = []
+        takes = Take.objects
+        if "language" in data:
+            takes = takes.filter(language__slug=data["language"])
+        if "version" in data:
+            takes = takes.filter(version=data["version"])
+        if "book" in data:
+            takes = takes.filter(book__slug=data["book"])
+        if "chapter" in data:
+            takes = takes.filter(chapter=data["chapter"])
+        if "startv" in data:
+            takes = takes.filter(startv=data["startv"])
+
+        test = []
+        lst.append(takes.values())
+        print(lst[0])
+        for i in lst[0]:
+            test.append(i["location"])
+        #directory = '/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/ExportRdy'
+
+ #Create an empty array of files in the zip
+        filesInZip = []
+        location = os.path.dirname(test[0])
+        print(location)
+# for all files, sub-folders in a directory
+        for subdir, dirs, files in os.walk(location):
+            # look at all the files
+            for file in files:
+                # store the absolute path which is is it's subdir and where the os step is
+                filePath = subdir + os.sep + file
+                # if the file is audio
+                if filePath.endswith(".wav") or filePath.endswith(".mp3"):
+                    #print "4\n"
+                    # Add to array so it can be added to the archive
+                    inputFile = filePath.title().lower()
+                    #print file.title().lower()
+                    #print inputFile[:-3].strip().replace(" ","").upper()#
+                    sound = AudioSegment.from_wav(inputFile)
+                    #print sound
+                    fileName = file.title()[:-4].strip().replace(" ","").lower() + ".mp3"
+                    #print fileName
+                    sound.export(fileName, format="mp3")
+                    #print "6"
+                    filesInZip.append(fileName)
+                    #print filesInZip#
+# using zip file create a file called zipped_file.zip
+        # adding the members ot filesInZip array to the compressed file
+        with zipfile.ZipFile('/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/export/zipped_file.zip', 'w') as zipped_f:
+            # for all the member in the array of files add them to the zip archive
+            # doing this - this way also preserves exactly the directory location that the files sit in even before the main archive
+            for members in filesInZip:
+                zipped_f.write(members)
+
+        filelist = [ f for f in os.listdir('/Users/lcheng/Desktop/8woc2017backend/tRecorderApi') if f.endswith(".mp3") ]
+        for f in filelist:
+            os.remove(f)
         return Response(lst, status=200)
 
 class FileUploadView(views.APIView):
@@ -137,7 +200,8 @@ class FileUploadView(views.APIView):
 
                 for root, dirs, files in os.walk(file_name):
                     for f in files:
-                        abpath = os.path.join(root, os.path.basename(f))
+                        #abpath = os.path.join(root, os.path.basename(f))
+                        abpath = os.path.abspath(os.path.join(root, f))
                         try:
                             meta = TinyTag.get(abpath)
                         except LookupError:
@@ -226,8 +290,8 @@ def getLanguageByCode(code):
     return ln
 
 def getBookByCode(code):
-    with open('books.json') as books_file:    
-        books = json.load(books_file) 
+    with open('books.json') as books_file:
+        books = json.load(books_file)
 
     bn = ""
     for dicti in books:
