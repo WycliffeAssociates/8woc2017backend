@@ -12,6 +12,7 @@ from .models import Language, Book, User, Take, Comment
 from tinytag import TinyTag
 from pydub import AudioSegment
 import zipfile
+import shutil
 import urllib2
 import pickle
 import json
@@ -135,16 +136,20 @@ class ProjectZipFiles(views.APIView):
 
         test = []
         lst.append(takes.values())
-        print(lst[0])
+        #print(lst[0])
         for i in lst[0]:
             test.append(i["location"])
+        #print(len(test))
         #directory = '/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/ExportRdy'
 
  #Create an empty array of files in the zip
         filesInZip = []
-        location = os.path.dirname(test[0])
-        print(location)
+        #location = os.path.dirname(test[0])
+        #print(location)
 # for all files, sub-folders in a directory
+        for loc in test:
+            shutil.copy2(loc,'/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/export')
+        location = '/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/export'
         for subdir, dirs, files in os.walk(location):
             # look at all the files
             for file in files:
@@ -176,6 +181,13 @@ class ProjectZipFiles(views.APIView):
         filelist = [ f for f in os.listdir('/Users/lcheng/Desktop/8woc2017backend/tRecorderApi') if f.endswith(".mp3") ]
         for f in filelist:
             os.remove(f)
+
+        directory='/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/export'
+        os.chdir(directory)
+        files=glob.glob('*.wav')
+        for filename in files:
+            os.remove(filename)
+
         return Response(lst, status=200)
 
 class FileUploadView(views.APIView):
