@@ -20,7 +20,7 @@ import pydub
 import time
 import uuid
 import os, glob
-
+from django.conf import settings
 class LanguageViewSet(viewsets.ModelViewSet):
     """This class handles the http GET, PUT and DELETE requests."""
     queryset = Language.objects.all()
@@ -133,23 +133,21 @@ class ProjectZipFiles(views.APIView):
             takes = takes.filter(chapter=data["chapter"])
         if "startv" in data:
             takes = takes.filter(startv=data["startv"])
-
         test = []
         lst.append(takes.values())
-        #print(lst[0])
         for i in lst[0]:
             test.append(i["location"])
-        #print(len(test))
-        #directory = '/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/ExportRdy'
-
- #Create an empty array of files in the zip
+        #Create an empty array of files in the zip
         filesInZip = []
-        #location = os.path.dirname(test[0])
-        #print(location)
-# for all files, sub-folders in a directory
+        # for all files, sub-folders in a directory
+
+        #location = 'ExportReady/'
+        if not os.path.exists(os.path.join(settings.BASE_DIR, 'media/export/')):
+            os.makedirs(os.path.join(settings.BASE_DIR, 'media/export/'))
+        #location = 'media/export/'
+        location = 'media/export/'
         for loc in test:
-            shutil.copy2(loc,'/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/export')
-        location = '/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/export'
+            shutil.copy2(loc, location)
         for subdir, dirs, files in os.walk(location):
             # look at all the files
             for file in files:
@@ -157,37 +155,25 @@ class ProjectZipFiles(views.APIView):
                 filePath = subdir + os.sep + file
                 # if the file is audio
                 if filePath.endswith(".wav") or filePath.endswith(".mp3"):
-                    #print "4\n"
                     # Add to array so it can be added to the archive
                     inputFile = filePath.title().lower()
-                    #print file.title().lower()
-                    #print inputFile[:-3].strip().replace(" ","").upper()#
                     sound = AudioSegment.from_wav(inputFile)
-                    #print sound
                     fileName = file.title()[:-4].strip().replace(" ","").lower() + ".mp3"
-                    #print fileName
                     sound.export(fileName, format="mp3")
-                    #print "6"
                     filesInZip.append(fileName)
-                    #print filesInZip#
-# using zip file create a file called zipped_file.zip
-        # adding the members ot filesInZip array to the compressed file
-        with zipfile.ZipFile('/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/export/zipped_file.zip', 'w') as zipped_f:
+        with zipfile.ZipFile('media/export/zipped_file.zip', 'w') as zipped_f:
             # for all the member in the array of files add them to the zip archive
             # doing this - this way also preserves exactly the directory location that the files sit in even before the main archive
             for members in filesInZip:
                 zipped_f.write(members)
-
-        filelist = [ f for f in os.listdir('/Users/lcheng/Desktop/8woc2017backend/tRecorderApi') if f.endswith(".mp3") ]
+        filelist = [ f for f in os.listdir(settings.BASE_DIR) if f.endswith(".mp3") ]
         for f in filelist:
             os.remove(f)
-
-        directory='/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/media/export'
+        directory='media/export/'
         os.chdir(directory)
         files=glob.glob('*.wav')
         for filename in files:
             os.remove(filename)
-
         return Response(lst, status=200)
 
 class FileUploadView(views.APIView):
@@ -302,6 +288,8 @@ def getLanguageByCode(code):
     return ln
 
 def getBookByCode(code):
+    #/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/books.json
+    #with open('/Users/lcheng/Desktop/8woc2017backend/tRecorderApi/books.json') as books_file:
     with open('books.json') as books_file:
         books = json.load(books_file)
 
