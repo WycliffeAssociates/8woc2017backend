@@ -11,6 +11,7 @@ from .serializers import TakeSerializer, CommentSerializer
 from .models import Language, Book, User, Take, Comment
 from tinytag import TinyTag
 from pydub import AudioSegment
+from random import randint
 import zipfile
 import shutil
 import urllib2
@@ -145,7 +146,7 @@ class ProjectZipFiles(views.APIView):
         if not os.path.exists(os.path.join(settings.BASE_DIR, 'media/export/')):
             os.makedirs(os.path.join(settings.BASE_DIR, 'media/export/'))
         #location = 'media/export/'
-        location = 'media/export/'
+        location = os.path.join(settings.BASE_DIR, 'media/export/')
         for loc in test:
             abpath = os.path.join(settings.BASE_DIR, loc)
             shutil.copy2(abpath, location)
@@ -162,7 +163,7 @@ class ProjectZipFiles(views.APIView):
                     fileName = file.title()[:-4].strip().replace(" ","").lower() + ".mp3"
                     sound.export(fileName, format="mp3")
                     filesInZip.append(fileName)
-        with zipfile.ZipFile('media/export/zipped_file.zip', 'w') as zipped_f:
+        with zipfile.ZipFile('media/export/' + str(randint(0,20)) + 'zipped_file.zip', 'w') as zipped_f:
             # for all the member in the array of files add them to the zip archive
             # doing this - this way also preserves exactly the directory location that the files sit in even before the main archive
             for members in filesInZip:
@@ -170,7 +171,7 @@ class ProjectZipFiles(views.APIView):
         filelist = [ f for f in os.listdir(settings.BASE_DIR) if f.endswith(".mp3") ]
         for f in filelist:
             os.remove(f)
-        directory='media/export/'
+        directory=os.path.join(settings.BASE_DIR, 'media/export/')
         os.chdir(directory)
         files=glob.glob('*.wav')
         for filename in files:
