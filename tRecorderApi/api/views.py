@@ -147,7 +147,8 @@ class ProjectZipFiles(views.APIView):
         #location = 'media/export/'
         location = 'media/export/'
         for loc in test:
-            shutil.copy2(loc, location)
+            abpath = os.path.join(settings.BASE_DIR, loc)
+            shutil.copy2(abpath, location)
         for subdir, dirs, files in os.walk(location):
             # look at all the files
             for file in files:
@@ -198,8 +199,8 @@ class FileUploadView(views.APIView):
 
                 for root, dirs, files in os.walk(file_name):
                     for f in files:
-                        #abpath = os.path.join(root, os.path.basename(f))
-                        abpath = os.path.abspath(os.path.join(root, f))
+                        abpath = os.path.join(root, os.path.basename(f))
+                        #abpath = os.path.abspath(os.path.join(root, f))
                         try:
                             meta = TinyTag.get(abpath)
                         except LookupError:
