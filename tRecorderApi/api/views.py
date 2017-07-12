@@ -158,7 +158,7 @@ class ProjectZipFiles(views.APIView):
 
         #process of renaming/converting to mp3
         for subdir, dirs, files in os.walk(location):
-            
+
             for file in files:
                 # store the absolute path which is is it's subdir and where the os step is
                 filePath = subdir + os.sep + file
@@ -172,7 +172,8 @@ class ProjectZipFiles(views.APIView):
                     filesInZip.append(fileName)
 
         # Creating zip file
-        with zipfile.ZipFile('media/export/' + str(randint(0,20)) + 'zipped_file.zip', 'w') as zipped_f:
+        with zipfile.ZipFile(os.path.join(settings.BASE_DIR, 'media/export/') + str(randint(0,20)) + 'zipped_file.zip', 'w') as zipped_f:
+        #with zipfile.ZipFile('media/export/' + str(randint(0,20)) + 'zipped_file.zip', 'w') as zipped_f:
             for members in filesInZip:
                 zipped_f.write(members)
 
@@ -190,8 +191,103 @@ class ProjectZipFiles(views.APIView):
 
         for filename in files:
             os.remove(filename)
-        #currently returns list of the takes we have gathered but this can easily be changed 
+        os.chdir(directory)
+        files = glob.glob('*.mp3')
+
+        for filename in files:
+                os.remove(filename)
+        #currently returns list of the takes we have gathered but this can easily be changed
         return Response(lst, status=200)
+
+class viewAllProjects(views.APIView):
+    parser_classes = (JSONParser,)
+    def post(self, request):
+        allTakes = Take.objects.all().values()
+        aVersion = []
+        aBook = []
+        data = json.loads(request.body)
+        #filters projects if needed
+        if "version" in data:
+            allTakes = allTakes.filter(version=data["version"])
+        if "book" in data:
+            allTakes = allTakes.filter(book__slug=data["book"])
+        for take in allTakes:
+            if take["language_id"] not in aVersion:
+                aVersion.append(take["language_id"])
+            if take["book_id"] not in aBook:
+                aBook.append(take["book_id"])
+        convert_keys_to_string(data)
+        if "language" in data:
+            allLanguages = Language.objects.filter(slug = data["language"]).values()
+        else:
+            allLanguages = Language.objects.all().values()
+        projects = []
+        #loops through languages to find projects
+        for lang in allLanguages:
+            usedBooks = []
+            usedVersion = []
+            lang = dict(lang)
+            takes = Take.objects.filter(language = lang['id']).values()
+            takes = list(takes)
+            #looks through takes to make sure Books/versions are correct
+            for indTake in takes:
+                lan = {}
+                indTake = convert_keys_to_string(indTake)
+                if indTake["book_id"] not in usedBooks:
+                    if indTake["book_id"] not in aBook:
+                        continue
+                    else:
+                        spBook = Book.objects.filter(id = indTake["book_id"]).values()
+                        lan["book"] = (spBook)
+                        lan["lang"] = lang
+                        lan["version"] = indTake["version"]
+                        lan["timestamp"] = indTake["date_modified"]
+                        lan["completed"] = 75
+                        #future user = User.objects.filter(id = indTake["user"]).values()
+                        lan["contributors"] =  "Jerome"
+                        usedBooks.append(indTake["book_id"])
+                        usedVersion.append(indTake["version"])
+                        projects.append(lan)
+                elif indTake["version"] not in usedVersion:
+                    if indTake["version"] not in aVersion:
+                        continue
+                    else:
+                        spBook = Book.objects.filter(id = indTake["book_id"]).values()
+                        lan["book"] = (spBook)
+                        lan["lang"] = lang
+                        lan["version"] = indTake["version"]
+                        lan["timestamp"] = indTake["date_modified"]
+                        lan["completed"] = 75
+                        #future user = User.objects.filter(id = indTake["user"]).values()
+                        lan["contributors"] =  "Jerome"
+                        usedVersion.append(indTake["version"])
+                        projects.append(lan)
+                else:
+                    continue
+        return Response(projects, status = 200)
+
+class projectChapterInfo(views.APIView):
+    parser_classes = (JSONParser,)
+
+    def post(self, request):
+        data = json.loads(request.body)
+        allTakes = Take.objects.all().values()
+        allTakes = allTakes.filter(version=data["version"])
+        allTakes = allTakes.filter(book__slug=data["book"])
+        allTakes = allTakes.filter(language__slug=data["language"])
+        chap = {}
+        chapters = []
+        for take in allTakes:
+            if take["chapter"] not in chapters:
+                idv = {}
+                idv["chapter"] = take["chapter"]
+                idv["checked_level"] = take["checked_level"]
+                idv["contributors"] = "Jerome"
+                idv["percent_complete"] = 75
+                idv["timestamp"] = 12
+                chapters.append(idv)
+        return Response(chapters, status = 200)
+
 
 class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser,)
@@ -316,3 +412,9 @@ def getBookByCode(code):
             bn = dicti["name"]
             break
     return bn
+def convert_keys_to_string(dictionary):
+    """Recursively converts dictionary keys to strings."""
+    if not isinstance(dictionary, dict):
+        return dictionary
+    return dict((str(k), convert_keys_to_string(v))
+        for k, v in dictionary.items())

@@ -231,3 +231,8 @@ tRecorderApi/htmlcov/
 language.json
 tRecorderApi/language.json
 tRecorderApi/api/CreateZIP.py
+tRecorderApi/media/dump/**/*.xml
+tRecorderApi/media/dump/**/*.rels
+tRecorderApi/media/dump/**/*.docx
+tRecorderApi/media/dump/**/*.docs
+tRecorderApi/media/dump/**/*.doc
