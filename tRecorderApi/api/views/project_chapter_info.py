@@ -3,6 +3,7 @@ from rest_framework.parsers import JSONParser
 import json
 from api.models import Take
 from rest_framework.response import Response
+from operator import itemgetter
 
 class ProjectChapterInfoView(views.APIView):
     parser_classes = (JSONParser,)
@@ -22,6 +23,8 @@ class ProjectChapterInfoView(views.APIView):
                 idv["checked_level"] = take["checked_level"]
                 idv["contributors"] = "Jerome"
                 idv["percent_complete"] = 75
-                idv["timestamp"] = 12
+                mostRecent = ""
+                idv["timestamp"] = take["date_modified"]
                 chapters.append(idv)
+        chapters = sorted(chapters, key = itemgetter('chapter'))
         return Response(chapters, status = 200)
