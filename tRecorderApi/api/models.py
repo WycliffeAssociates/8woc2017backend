@@ -1,7 +1,7 @@
 from django.db import models
 
 class Language(models.Model):
-    code = models.CharField(max_length=20, unique=True, blank=True)
+    slug = models.CharField(max_length=20, unique=True, blank=True)
     name = models.CharField(max_length=100, blank=True)
 
     class Meta:
@@ -11,7 +11,7 @@ class Language(models.Model):
         return self.name
 
 class Book(models.Model):
-    code = models.CharField(max_length=3, unique=True, blank=True)
+    slug = models.CharField(max_length=3, unique=True, blank=True)
     name = models.CharField(max_length=100, blank=True)
     booknum = models.IntegerField(default=0)
 

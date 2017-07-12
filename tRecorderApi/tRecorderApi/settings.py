@@ -25,7 +25,7 @@ SECRET_KEY = '&9e^=922_&wi-bw@bbe$id#r$7hb(im03nrow5w@tgg8##hfd('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['172.19.145.88', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['172.19.145.91', '172.19.145.88', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -52,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 """REST_FRAMEWORK = {
@@ -132,7 +133,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
+STATIC_ROOT = 'static'
 STATIC_URL = '/static/'
 
-#MEDIA_URL = 'dump/'
-#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = 'media'
+MEDIA_URL = '/media/'
