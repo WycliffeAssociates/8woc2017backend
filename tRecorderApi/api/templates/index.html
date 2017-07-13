@@ -19,6 +19,7 @@
 <a href="/api/upload/zip">Upload zip</a> <br><br>
 <a href="/api/all_project">Show Project</a> <br><br>
 <a href="/api/get_chapters">Show Chapters</a><br><br>
+<a href="/api/get_versions">Show Versions</a><br><br>
 
 <div>
     <div>{{ lasttake }}</div>
@@ -41,7 +42,7 @@
     }, false);
 
     function jspost(url, data) {
-        var xmlhttp = new XMLHttpRequest(); // new HttpRequest instance 
+        var xmlhttp = new XMLHttpRequest(); // new HttpRequest instance
         xmlhttp.open("POST", url);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         xmlhttp.send(JSON.stringify(data));

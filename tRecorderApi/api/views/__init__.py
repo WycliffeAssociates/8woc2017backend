@@ -13,3 +13,4 @@ from exclude_files import *
 from source_file_upload import *
 from all_projects import *
 from project_chapter_info import *
+from version_list import *
