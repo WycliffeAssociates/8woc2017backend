@@ -1,5 +1,6 @@
 from rest_framework import parsers
 
+
 class MP3StreamParser(parsers.BaseParser):
     """
     stream parser.

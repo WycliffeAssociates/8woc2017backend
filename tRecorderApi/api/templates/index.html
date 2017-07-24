@@ -1,28 +1,126 @@
-<form action="/api/upload/zip" method="post" enctype="multipart/form-data">
-    <input type="file" name="upload" />
-    <input type="submit" /> {% csrf_token %}
-</form>
+<div style="width: 600px; margin: 0 auto">
+    <br>
+    <form action="/api/upload/zip" method="post" enctype="multipart/form-data">
+        <input type="file" name="upload" /> {% csrf_token %}
+        <input type="submit" value="Upload Zip" />
+    </form>
+    <br>
+    <form action="/api/source/tr" method="post" enctype="multipart/form-data">
+        <input type="file" name="upload" /> {% csrf_token %}
+        <input type="submit" value="Upload Source (.tr)" />
+    </form>
 
-<a href="/api/languages">Languages</a> <br><br>
-<a href="/api/books">Books</a> <br><br>
-<a href="/api/users">Users</a> <br><br>
-<a href="/api/takes">Takes</a> <br><br>
-<a href="/api/comments">Comments</a> <br><br>
-<a href="/api/get_project">Get Project</a> <br><br><br>
-<a href="/api/upload/zip">Upload zip</a> <br><br>
+    {% if lasttake %}
+    <hr>
+    <div style="width: 200px; float: left">
+        <a href="/api/languages">Languages</a> <br><br>
+        <a href="/api/books">Books</a> <br><br>
+        <a href="/api/projects">Projects</a> <br><br>
+        <a href="/api/chapters">Chapters</a> <br><br>
+        <a href="/api/chunks">Chunks</a> <br><br>
+        <a href="/api/takes">Takes</a> <br><br>
+        <a href="/api/comments">Comments</a> <br><br>
+        <a href="/api/users">Users</a> <br><br>
+    </div>
+    <div style="width: 200px; float: left">
+        <a href="/api/get_project_takes">Get Project Takes</a> <br><br>
+        <a href="/api/update_project_takes">Update Project Takes</a> <br><br>
+        <a href="/api/all_projects">Show Projects</a> <br><br>
+        <a href="/api/get_chapters">Show Chapters</a><br><br>
+        <a href="/api/get_versions">Show Versions</a><br><br>
+        <a href="/api/get_langs">Show Languages</a><br><br>
+        <a href="/api/get_books">Show Books</a><br><br>
+    </div>
+    <div style="width: 200px; float: left">
+        <a href="/api/zip_files">Zip Files</a> <br><br>
+        <a href="/api/get_source">Get Source</a> <br><br>
+        <a href="/api/push_takes">Push Takes</a> <br><br>
+        <a href="/api/exclude_files">Exclude Files</a> <br><br>
+    </div>
+    <div style="clear:both"></div>
+    <hr>
 
-<audio controls>
-  <source src="/api/stream/media/dump/1498844797.99f16a97e3-74de-422d-87f0-c9f58c114155/mrk/07/en-x-demo2_ulb_b42_mrk_c07_v27-28_t02.wav" type="audio/mpeg">
-Your browser does not support the audio element.
-</audio>
-<br>
-<audio controls>
-  <source src="/api/stream/media/dump/1498844797.99f16a97e3-74de-422d-87f0-c9f58c114155/mrk/07/en-x-demo2_ulb_b42_mrk_c07_v20-23_t10.wav" type="audio/mpeg">
-Your browser does not support the audio element.
-</audio>
+    <div>
+        <div>{{ lasttake }}</div>
+        <audio controls>
+        <source src="/{{ lasttake.location }}" type="audio/{{filetype}}">
+        Your browser does not support the audio element.
+    </audio>
+    </div>
+    <br>
+    <hr>
 
-<div>
-    {% if uploaded_file_url %}
-    <p>File uploaded at: <a href="{{ uploaded_file_url }}">{{ uploaded_file_url }}</a></p>
+    <div style="width: 200px; float: left">
+        <button id="getexport">Get Zip For Export</button>
+        <img style="display: none" id="getexport_loader" src="/static/loader.gif" />
+    </div>
+    <div style="width: 200px; float: left">
+        <button id="getsource">Get Source (.tr)</button>
+        <img style="display: none" id="getsource_loader" src="/static/loader.gif" />
+    </div>
+    <div style="width: 200px; float: left">
+        <button id="getzip">Get zip</button>
+        <img style="display: none" id="getzip_loader" src="/static/loader.gif" />
+    </div>
+    <div style="clear:both"></div>
     {% endif %}
 </div>
+
+<script>
+    document.getElementById("getexport").addEventListener("click", function(event) {
+        document.getElementById("getexport_loader").style.display = "inline-block";
+        jspost("/api/zip_files/", {
+            "language": "en-x-demo2",
+            "version": "ulb",
+            "book": "mrk"
+        }, function(response) {
+            document.getElementById("getexport_loader").style.display = "none";
+            saveAs(response, 'en-x-demo2_ulb_mrk.zip')
+        })
+    }, false);
+
+    document.getElementById("getsource").addEventListener("click", function(event) {
+        document.getElementById("getsource_loader").style.display = "inline-block";
+        jspost("/api/get_source/", {
+            "language": "en-x-demo2",
+            "version": "ulb",
+            "is_source": false
+        }, function(response) {
+            document.getElementById("getsource_loader").style.display = "none";
+            saveAs(response, 'en-x-demo2_ulb.tr')
+        })
+    }, false);
+
+    document.getElementById("getzip").addEventListener("click", function(event) {
+        loader = document.getElementById("getzip_loader");
+        loader.style.display = "inline-block"
+        jspost("/api/push_takes/", {
+            "project": {
+                "language": "en-x-demo2",
+                "version": "ulb",
+                "book": "mrk"
+            },
+            "files_list": {}
+        }, function(response) {
+            loader.style.display = "none";
+            console.log(loader.style.display);
+            saveAs(response, 'en-x-demo2_ulb_mrk.zip')
+        })
+    }, false);
+
+    function jspost(url, data, success) {
+        var xmlhttp = new XMLHttpRequest(); // new HttpRequest instance
+        xmlhttp.open("POST", url);
+        xmlhttp.responseType = "blob"
+
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == XMLHttpRequest.DONE) {
+                success(this.response);
+            }
+        }
+
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.send(JSON.stringify(data));
+    }
+</script>
+<script src="/static/FileSaver.min.js"></script>
