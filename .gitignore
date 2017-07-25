@@ -26,7 +26,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+#lib/
 lib64/
 parts/
 sdist/
@@ -134,7 +134,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+#lib/
 lib64/
 parts/
 sdist/
@@ -229,3 +229,19 @@ ENV/
 tRecorderApi/test_log.txt
 tRecorderApi/htmlcov/
 language.json
+**/language.json
+tRecorderApi/language.json
+
+tRecorderApi/api/CreateZIP.py
+tRecorderApi/media/dump/**/*.xml
+tRecorderApi/media/dump/**/*.rels
+tRecorderApi/media/dump/**/*.docx
+tRecorderApi/media/dump/**/*.docs
+tRecorderApi/media/dump/**/*.doc
+tRecorderApi/sample.docx
+tRecorderApi/aoh
+tRecorderApi/config.py
+tRecorderApi/static/rest_framework
+tRecorderApi/static/admin
+#tRecorderApi/static/FileSaver.min.js
+#tRecorderApi/static/loader.gif

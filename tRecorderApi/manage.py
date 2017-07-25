@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-import os
-import sys
+import os   #pragma:no cover
+import sys  #pragma:no cover
 
-if __name__ == "__main__":
+if __name__ == "__main__":   #pragma:no cover
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tRecorderApi.settings")
     try:
         from django.core.management import execute_from_command_line
@@ -18,5 +18,5 @@ if __name__ == "__main__":
                 "available on your PYTHONPATH environment variable? Did you "
                 "forget to activate a virtual environment?"
             )
-        raise
+        raise   #pragma:no cover
     execute_from_command_line(sys.argv)

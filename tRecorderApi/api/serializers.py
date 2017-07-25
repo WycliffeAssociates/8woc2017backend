@@ -1,5 +1,13 @@
 from rest_framework import serializers
-from .models import Language, Book, User, Take, Comment
+from .models import Language, Book, User, Take, Comment, Chapter, Chunk, Project
+
+class ProjectSerializer(serializers.ModelSerializer):
+    """Serializer to map the Model instance into JSON format."""
+
+    class Meta:
+        """Meta class to map serializer's fields with the model fields."""
+        model = Project
+        fields = '__all__'
 
 class LanguageSerializer(serializers.ModelSerializer):
     """Serializer to map the Model instance into JSON format."""
@@ -15,6 +23,22 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to map serializer's fields with the model fields."""
         model = Book
+        fields = '__all__'
+
+class ChapterSerializer(serializers.ModelSerializer):
+    """Serializer to map the Model instance into JSON format."""
+
+    class Meta:
+        """Meta class to map serializer's fields with the model fields."""
+        model = Chapter
+        fields = '__all__'
+
+class ChunkSerializer(serializers.ModelSerializer):
+    """Serializer to map the Model instance into JSON format."""
+
+    class Meta:
+        """Meta class to map serializer's fields with the model fields."""
+        model = Chunk
         fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
