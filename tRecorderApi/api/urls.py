@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^get_versions/$', views.getVersionsView.as_view()),
     url(r'^get_books/$', views.getBooksView.as_view()),
     url(r'^push_takes/$', views.PushTakesView.as_view()),
+    url(r'^stitch_takes/$', views.SourceStitchView.as_view()),
 ]
 
 urlpatterns += router.urls
