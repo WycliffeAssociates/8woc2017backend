@@ -1,0 +1,156 @@
+swagger: "2.0"
+info:
+  description: "This describes the API specification for translationExchange. "
+  version: "0.1.0"
+  title: "translationExchange"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+schemes:
+- "http"
+paths:
+  
+definitions:
+  Language:
+    type: "object"
+    properties:
+      id:
+        type: integer
+      slug:
+        type: string
+        format: max_length=50
+      name:
+        type: string
+        format: max_length=255
+  Version:
+    type: "object"
+    properties:
+      id:
+        type: integer
+      slug:
+        type: string
+        format: max_length=50
+      name:
+        type: string
+        format: max_length=255
+  Anthology:
+    type: "object"
+    properties:
+      id:
+        type: integer
+      slug:
+        type: string
+        format: max_length=50
+      name:
+        type: string
+        format: max_length=255
+  Mode:
+    type: "object"
+    properties:
+      id:
+        type: integer
+      slug:
+        type: string
+        maxLength: 50
+      name:
+        type: string
+        maxLength: 255
+      unit:
+        type: integer
+        enum:
+         - "SINGLE"
+         - "MULTI"
+  Book:
+    type: "object"
+    properties:
+      id:
+        type: integer
+      anthology:
+        type: integer
+      slug:
+        type: string
+        format: max_length=50
+      name:
+        type: string
+        format: max_length=255
+      number:
+        type: integer
+        default: 0
+  Project:
+    type: "object"
+    properties:
+      language:
+        type: integer
+      version:
+        type: integer
+      anthology:
+        type: integer
+      book:
+        type: integer
+      mode:
+        type: integer
+      published:
+        type: boolean
+        default: false
+      source language:
+        type: integer
+  Chapter:
+    type: "object"
+    properties:
+      project:
+        type: integer
+      number:
+        type: integer
+      checked level:
+        type: integer
+      published:
+        type: boolean
+      comments:
+        type: integer
+  Chunk:
+    type: "object"
+    properties:
+      chapter:
+        type: integer
+      startv:
+        type: integer
+        default: 0
+      endv:
+        type: integer
+        default: 0
+      comments:
+        type: integer
+  Take:
+    type: "object"
+    properties:
+      chunk:
+        type: integer
+      duration:
+        type: integer
+      location:
+        type: string
+        maxLength: 255
+      rating:
+        type: integer
+      published:
+        type: boolean
+      markers:
+        type: string
+      date modified:
+        type: integer
+      comment:
+        type: integer
+  Comment:
+    type: "object"
+    properties:
+      location:
+        type: string
+        maxLength: 255
+      date modified:
+        type: integer
+      content type:
+        type: integer
+      object id:
+        type: integer
+      content object:
+        type: integer

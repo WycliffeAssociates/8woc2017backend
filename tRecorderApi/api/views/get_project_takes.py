@@ -17,17 +17,7 @@ class GetProjectTakesView(views.APIView):
                 return Response({"error": "not_enough_parameters"}, status=400)
         if "chapter" not in data:
             return Response({"error": "not_enough_parameters"}, status=400)
-
-        new_data = {}
-
-        new_data["chapter"] = data["chapter"]
-        if "project" in data:
-            new_data["project"] = data["project"]
-        else:
-            new_data["language"] = data["language"]
-            new_data["version"] = data["version"]
-            new_data["book"] = data["book"]
-
+        
         lst = Chunk.getChunksWithTakesByProject(data)
 
         return Response(lst, status=200)

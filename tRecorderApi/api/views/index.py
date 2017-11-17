@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from api.models import Take
 
+
 def index(request):
     take = Take.objects.all().last()
     filetype = ""
@@ -9,4 +10,9 @@ def index(request):
             filetype = "wav"
         elif take.location.endswith(".mp3"):
             filetype = "mpeg"
-    return render(request, 'index.html', {"lasttake": take, "filetype": filetype})
+    return render(request,
+                  'index.html',
+                  {
+                      "lasttake": take,
+                      "filetype": filetype
+                  })

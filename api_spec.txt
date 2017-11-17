@@ -1,0 +1,247 @@
+api/all_projects
+-------------------------------------------------------------------------------
+Request:
+{
+        "language": language_slug, #optional
+        "book":book_slug, #optional
+        "anthology":anthology_slug, #optional
+        "version":version_slug, #optional
+        "is_publish": true #optional
+}
+Response:
+ [
+    {
+        "id":project_id,
+        "published" : boolean,
+        "contributors" : [
+            "contributor_name",
+            ...
+        ],
+        "date_modified" : timestamp,
+        "completed" : integer,
+        "check_level" : integer,
+        "language" : {
+            "slug": language_slug,
+            "name": language_name
+        },
+        "book": {
+            "slug": book_slug,
+            "number": book_number,
+            "name": book_name
+        },
+        "version": {
+            "slug": version_slug,
+            "name": version_name
+        },
+        "anthology": {
+            "slug": anthology_slug,
+            "name": anthology_name
+        }
+    },
+    ...
+]
+
+Front end changes:
+Need to change anthology to an object, changes how front end accesses this
+
+api/get_books
+-------------------------------------------------------------------------------
+response:
+[
+    {
+        "id": integer
+        "slug": book_slug
+        "name": book_name,
+        "book_num": book_number,
+    },
+    ...
+]
+
+api/get_langs
+response:
+[
+    {
+        "id":integer
+        "slug":language_slug,
+        "name":language_name,
+    },
+    ...
+]
+
+api/get_versions
+response:
+[
+    {
+        "id":integer
+        "slug":version_slug,
+        "name":version_name
+    },
+    ...
+]
+
+api/get_anthologies
+ response:
+[
+    {
+        "id": integer
+        "slug":anthology_slug,
+        "name":anthology_name            
+    },
+    ...
+]
+
+Front end changes:
+versions need to be modified to expect an object in ProjectFilters.js
+
+api/get_source
+-------------------------------------------------------------------------------
+request:
+{
+  "project":projectId
+}
+
+response:
+{
+  "location":location
+}
+
+api/get_project_takes
+-------------------------------------------------------------------------------
+request:
+{
+    "book_slug": book_slug,
+    "language_slug": language_slug,
+    "version_slug": version_slug,
+    "chapter" : chapter_number
+}
+
+response:
+{
+    "chunks": [
+        {
+            "endv": integer,
+            "startv": integer,
+            "takes": [
+                {
+                    "user": {
+                        "picture": path_string,
+                        "agreed": boolean,
+                        "name": contributor_name
+                    },
+                    "comments": [
+                        {
+                            "comment": {
+                                "date_modified": timestamp,
+                                "id": integer,
+                                "location": path_string
+                            },
+                            "user": {
+                                "picture": path_string,
+                                "agreed": boolean,
+                                "name": contributor_name
+                            },
+                        },
+                        ...
+                    ],
+                    "take": {
+                        "rating": integer,
+                        "is_publish": boolean,
+                        "date_modified": timestamp,
+                        "markers": {
+                            "1": integer
+                        },
+                        "location": path_string,
+                        "duration": integer,
+                        "id": integer
+                    }
+                },
+                ...
+            ],
+            "comments": [
+                {
+                    "comment": {
+                        "date_modified": timestamp,
+                        "id": integer,
+                        "location": path_string
+                    },
+                    "user": {
+                        "picture": path_string,
+                        "agreed": boolean,
+                        "name": contributor_name
+                    }
+                },
+                ...
+            ],
+            "id": integer
+        },
+        ...
+    ]
+}
+
+
+get_project_takes should be broken into the following:
+api/get_chunks
+api/get_takes
+api/get_comments
+
+api/get_chunks
+-------------------------------------------------------------------------------
+request:
+{
+    "book_slug": book_slug,
+    "language_slug": language_slug,
+    "version_slug": version_slug,
+    "chapter_number" : chapter_number
+}
+
+or
+
+{
+    "project_id" : project_id
+    "chapter_number" : chapter_number
+}
+
+or
+
+ {
+     "chapter_id" : chapter_id
+ }
+
+response:
+[
+    {
+        "endv": integer,
+        "startv": integer,
+        "id": integer
+    },
+    ...
+]
+
+api/get_takes:
+request:
+{
+    "chunk_id" : chunk_id
+}
+
+response:
+[
+    {
+        "rating": integer,
+        "published": boolean,
+        "date_modified": timestamp,
+        "markers": {
+            "label": integer
+        },
+        "location": path_string,
+        "duration": integer,
+        "id": integer
+    },
+    ...
+]
+
+api/get_comments
+-------------------------------------------------------------------------------
+request:
+{
+
+}

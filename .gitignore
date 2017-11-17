@@ -225,7 +225,6 @@ ENV/
 *.sqlite3
 *.coverage
 .idea/
-.vscode/
 tRecorderApi/test_log.txt
 tRecorderApi/htmlcov/
 language.json
@@ -244,3 +243,5 @@ tRecorderApi/aoh
 tRecorderApi/config.py
 tRecorderApi/static/rest_framework
 tRecorderApi/static/admin
+tRecorderApi/api/migrations
+/.vscode/
