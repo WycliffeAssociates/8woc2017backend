@@ -1,8 +1,8 @@
-# translationDB
+# translation Exchange Backend
 A local database to help translators send and access their audio files in an organized and efficient way. The system must be able to operate fully, without any kind of remote internet access. 
 
 ## Objective
-- The goal of TranslationDB is to be a strong Back-End DBMS for [translationRecorder](https://github.com/WycliffeAssociates/translationRecorder) and [translationManager](https://github.com/WycliffeAssociates/8woc2017).
+- The goal of TranslationDB is to be a strong Back-End DBMS for [translationRecorder](https://github.com/WycliffeAssociates/translationRecorder) and [Translation Exchange](https://github.com/WycliffeAssociates/translationExchange).
 - The database will be able to interact with the UI using a customized REST API that is running on the local server.
 - Store large files in the host machine's *File System*, in order to save on space in the database.
 
@@ -14,7 +14,7 @@ A local database to help translators send and access their audio files in an org
    - *Wired*
 * Localized in English
 
-## Built With
+## Built Using
 * [SQLite](https://www.sqlite.org/index.html) - Chosen for Rapid Prototyping and Fast Queries | Built into Django
 * [Python 2.7](https://www.python.org/download/releases/2.7/)
 * [Django](https://github.com/django/django) - For running a local Web Server
