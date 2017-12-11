@@ -8,10 +8,18 @@ class Book(models.Model):
     number = models.IntegerField(default=0)
 
     @staticmethod
-    def get_book(anthology_slug, book_slug):
-        book = Book.objects.filter(book__slug__iexact=book_slug)
-        book = Book.objects.filter(anthology__slug__iexact=anthology_slug)
-        return book
+    def get_books(books):
+        book_list = []
+        dic = {}
+        for book in books:
+            dic = {
+                "id": book.id,
+                "slug": book.slug,
+                "name": book.name,
+                "book_num": book.number
+            }
+            book_list.append(dic)
+        return book_list
 
     @staticmethod
     def get_books_list():
