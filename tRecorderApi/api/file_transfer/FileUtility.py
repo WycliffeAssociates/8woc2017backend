@@ -184,7 +184,7 @@ class FileUtility:
                             take_location)
 
     @staticmethod
-    def relative_path(self, location):
+    def relative_path(location):
         reg = re.search('(media\/.*)$', location)
         return reg.group(1)
 
