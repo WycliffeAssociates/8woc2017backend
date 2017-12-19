@@ -44,9 +44,12 @@ class SourceStitchView(views.APIView):
                     "book"] + "_" + str(data["chapter"])
 
                 stitchedSource.export(
-                    stitch_folder + "/" +
-                    project_name +
-                    ".mp3", format="mp3")
+                    os.path.join(
+                        stitch_folder,
+                        project_name + ".mp3"
+                    ),
+                    format="mp3"
+                )
             else:
                 return Response({"error": "no_published_takes"}, status=400)
         else:
@@ -55,37 +58,41 @@ class SourceStitchView(views.APIView):
         return Response(
             {
                 "location":
-                relative_path(
-                    stitch_folder + "/" +
-                    project_name + ".mp3")
+                FileUtility.relative_path(
+                    os.path.join(
+                        stitch_folder,
+                        project_name + ".mp3"
+                    )
+                )
             },
             status=200)
 
+
 # cod flow
 """
-#Check if language,version,book,chapter in data,else
-#If language,version,boo,chapter is not found in data ,
+# Check if language,version,book,chapter in data,else
+# If language,version,boo,chapter is not found in data ,
  responses with message "not_enough_paramters"(status=400)
 
 //database call
-#Makes a method call in Take for gettings chunks(method in the take
+# Makes a method call in Take for gettings chunks(method in the take
 is cmmented)
 
 //creates list of take locations
-#Chunks are sorted by starv
-#Sets all takes to chunks
-#Loops through takes
-#Continues if take.is_published is not true
-#Creates list of take locations
-#Check if location list size is greater than 0,else
-#If location list is less than 0,
+# Chunks are sorted by starv
+# Sets all takes to chunks
+# Loops through takes
+# Continues if take.is_published is not true
+# Creates list of take locations
+# Check if location list size is greater than 0,else
+# If location list is less than 0,
  response with message "no published_takes"(status=400)
 
 //stitch takes together
-#Get the first item pass it to pydub and pop it off the list
-#Loop through the remaining list and concatenate all the list in string form
-#Creates media/source folder if does not exists
-#Creates project_name string
-#Exports the stitched as media/source/project_name.mp3
-#Responses is location to stiched takes
+# Get the first item pass it to pydub and pop it off the list
+# Loop through the remaining list and concatenate all the list in string form
+# Creates media/source folder if does not exists
+# Creates project_name string
+# Exports the stitched as media/source/project_name.mp3
+# Responses is location to stiched takes
 """
