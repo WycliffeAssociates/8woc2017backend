@@ -6,7 +6,7 @@ import json
 from rest_framework.response import Response
 import os
 from django.conf import settings
-from .helpers import get_relative_path
+from api.file_transfer import FileUtility
 
 
 class SourceStitchView(views.APIView):
@@ -55,7 +55,7 @@ class SourceStitchView(views.APIView):
         return Response(
             {
                 "location":
-                get_relative_path(
+                relative_path(
                     stitch_folder + "/" +
                     project_name + ".mp3")
             },

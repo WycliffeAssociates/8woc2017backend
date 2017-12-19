@@ -23,13 +23,17 @@ class Comment(models.Model):
     @staticmethod
     def get_comments(chunk_id=None, take_id=None, chapter_id=None):
         commented_object = None
+        object_id = None
         if chunk_id is not None:
-             commented_object = Chunk.objects.get(id=chunk_id)
+             commented_object = Chunk
+             object_id = chunk_id
         elif take_id is not None:
-            commented_object = Take.objects.get(id=take_id)
+            commented_object = Take
+            object_id = take_id
         elif chapter_id is not None:
-            commented_object = Chapter.objects.get(id=chapter_id)
+            commented_object = Chapter
+            object_id = chapter_id
         else:
             return None
-        comments = commented_object.comments.all()
+        comments = Comment.objects.filter(object_id=object_id, content_type=ContentType.objects.get_for_model(commented_object))
         return comments

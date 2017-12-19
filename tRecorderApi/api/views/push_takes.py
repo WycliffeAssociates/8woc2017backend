@@ -6,7 +6,8 @@ from rest_framework import views
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from api.models import Chunk
-from .helpers import getFileName, md5Hash, getFilePath, get_relative_path
+from .helpers import getFileName, md5Hash, getFilePath
+from api.file_transfer import FileUtility
 from django.conf import settings
 import os
 
@@ -51,7 +52,7 @@ class PushTakesView(views.APIView):
             mf = io.StringIO()
             with zipfile.ZipFile(mf, 'w') as zipped_f:
                 for audio in takes_name_and_locations:
-                    zipped_f.write(audio, getFilePath(get_relative_path(audio)))
+                    zipped_f.write(audio, getFilePath(FileUtility.relative_path(audio)))
             response = HttpResponse(mf.getvalue(), content_type='application/zip')
             response['Content-Disposition'] = 'attachment; filename=file.zip'
             return response

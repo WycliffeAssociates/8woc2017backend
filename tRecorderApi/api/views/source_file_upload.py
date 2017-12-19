@@ -7,7 +7,7 @@ import uuid
 
 from api.models import Language, Book, Take
 from django.conf import settings
-from .helpers import get_relative_path
+from api.file_transfer import FileUtility
 from rest_framework import views
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
@@ -48,7 +48,7 @@ class UploadSourceFileView(views.APIView):
             for root, dirs, files in os.walk(tempFolder):
                 for f in files:
                     abpath = os.path.join(root, os.path.basename(f))
-                    relpath = get_relative_path(abpath)
+                    relpath = FileUtility.relative_path(abpath)
                     meta = TinyTag.get(abpath)
 
                     if meta and meta.artist:
