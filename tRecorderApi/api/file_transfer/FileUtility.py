@@ -8,7 +8,8 @@ import time
 import urllib.error
 import urllib.request
 import uuid
-
+from pathlib import PurePath
+from django.conf import settings
 import urllib3
 from tinytag import TinyTag
 
@@ -18,8 +19,9 @@ class FileUtility:
     def root_dir(root_dir_of):
         directory = ''
         for dir in root_dir_of:
-            directory += dir + "/"
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            directory = os.path.join(directory, dir)
+        base_dir = os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))))
 
         uuid_name = str(time.time()) + str(uuid.uuid4())
         root_directory = os.path.join(base_dir, directory + uuid_name)
@@ -41,7 +43,7 @@ class FileUtility:
                 if f == "manifest.json":
                     manifest = json.load(open(abpath))
                     continue
-                relpath = self.get_relative_path(abpath)
+                relpath = self.relative_path(abpath)
                 try:
                     meta = TinyTag.get(abpath)  # get metadata for every file
                 except LookupError as e:
@@ -57,7 +59,8 @@ class FileUtility:
                     is_source_file = True
                     manifest = self.create_manifest(take_info, metadata)
 
-                Take.saveTakesToDB(take_info, relpath, metadata, manifest, is_source_file)
+                Take.saveTakesToDB(take_info, relpath,
+                                   metadata, manifest, is_source_file)
                 # if ext == 'tr':
                 #     os.remove(os.path.join(directory, "source.tr"))
 
@@ -70,7 +73,7 @@ class FileUtility:
                 "book":       meta["book"],
                 "version":    meta["version"],
                 "mode":       meta["mode"]
-        }
+                }
 
         return dict
 
@@ -94,11 +97,6 @@ class FileUtility:
             return lng_book_dur, take_info
         except Exception as e:
             return 'bad meta', 400
-
-    @staticmethod
-    def get_relative_path(location):
-        reg = re.search('(media\/.*)$', location)
-        return reg.group(1)
 
     @staticmethod
     def getLanguageByCode(code):
@@ -140,9 +138,10 @@ class FileUtility:
                 temp_file.write(chunk)
             try:
                 FNULL = open(os.devnull, 'wb')
-                base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                base_dir = os.path.dirname(os.path.dirname(
+                    os.path.dirname(os.path.abspath(__file__))))
 
-                path = os.path.join(base_dir, 'aoh/aoh.jar')
+                path = os.path.join(base_dir, "aoh", "aoh.jar")
                 file_path = os.path.join(os.path.join(directory, "source.tr"))
 
                 subprocess.check_output(
@@ -155,8 +154,6 @@ class FileUtility:
 
                 FNULL.close()
 
-
-
                 return 'ok', 200
 
             except Exception as e:
@@ -164,7 +161,8 @@ class FileUtility:
                 return str(e), 400
 
     def create_path(self, root_dir, lang_slug, version, book_slug, chapter_number):
-        path = os.path.join(root_dir, lang_slug, version, book_slug, chapter_number).replace("\\","/")
+        path = os.path.join(root_dir, lang_slug, version,
+                            book_slug, chapter_number)
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -173,20 +171,30 @@ class FileUtility:
     def create_folder_path(self, root_dir, lang, version, book):
         return os.path.join(root_dir, lang, version, book)
 
-    def create_chapter_path(self, root_dir, lang,version,book,chapter_number):
-        path = os.path.join(self.create_folder_path(root_dir,lang, version, book), chapter_number)
+    def create_chapter_path(self, root_dir, lang, version, book, chapter_number):
+        path = os.path.join(self.create_folder_path(
+            root_dir, lang, version, book), chapter_number)
         if not os.path.exists(path):
             os.makedirs(path)
         return path
 
     def take_location(self, take_location):
-        return os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-                            take_location)
+        return os.path.join(
+            os.path.dirname(
+                os.path.dirname(
+                    os.path.dirname(
+                        os.path.abspath(__file__)
+                    )
+                )
+            ),
+            take_location
+        )
 
     @staticmethod
     def relative_path(location):
-        reg = re.search('(media\/.*)$', location)
-        return reg.group(1)
+        p = PurePath(location)
+        pr = p.relative_to(os.path.join(settings.BASE_DIR, "media"))
+        return str(pr)
 
     def copy_files_from_src_to_dest(self, location_list):
 
@@ -194,7 +202,8 @@ class FileUtility:
             shutil.copy2(location["src"], location["dst"])
 
     def copy_files(self, src, dst):
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        base_dir = os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))))
         shutil.copy2(os.path.join(base_dir, src), dst)
         return os.path.join(dst, os.path.basename(src))
 
@@ -213,15 +222,17 @@ class FileUtility:
         os.rename(oldname, newname)
 
     def create_tr_path(self, media, tmp, filename):
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        base_dir = os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))))
         return os.path.join(base_dir, media, tmp, filename + ".tr")
 
     def compile_into_tr(self, root_dir):
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        base_dir = os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))))
         FNULL = open(os.devnull, 'w')
         subprocess.call(
             ['java', '-jar', os.path.join(
-                base_dir, 'aoh/aoh.jar'), '-c', '-tr', root_dir],
+                base_dir, 'aoh', 'aoh.jar'), '-c', '-tr', root_dir],
             stdout=FNULL, stderr=subprocess.STDOUT)
         FNULL.close()
 
@@ -229,4 +240,3 @@ class FileUtility:
     def check_if_path_exists(path):
         path_exist = os.path.exists(path)
         return path_exist
-

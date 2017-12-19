@@ -31,11 +31,6 @@ def highPassFilter(location):
     new.export(location, format="wav")
 
 
-def get_relative_path(location):
-    reg = re.search('(media\/.*)$', location)
-    return reg.group(1)
-
-
 def zip_files_root_directory():
     uuid_name = str(time.time()) + str(uuid.uuid4())
     project_root_directory = os.path.join(
