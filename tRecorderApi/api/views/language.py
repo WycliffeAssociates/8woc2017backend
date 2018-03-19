@@ -4,7 +4,8 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from api.serializers import LanguageSerializer
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
     operation_description="Return list of languages based on given query string",
@@ -23,7 +24,9 @@ from api.serializers import LanguageSerializer
 class LanguageViewSet(viewsets.ModelViewSet):
     queryset = Language.objects.all()
     serializer_class = LanguageSerializer
-
+    authentication_classes=(TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    
     def build_params_filter(self, query):
         pk = query.get("id", None)
         slug = query.get("slug", None)

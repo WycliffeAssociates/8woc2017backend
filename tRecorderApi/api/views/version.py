@@ -4,7 +4,8 @@ from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
     operation_description="Return list of takes based on given query string",
@@ -23,7 +24,9 @@ from rest_framework import viewsets
 class VersionViewSet(viewsets.ModelViewSet):
     queryset = Version.objects.all()
     serializer_class = VersionSerializer
-
+    authentication_classes=(TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    
     def build_params_filter(self, query):
         pk = query.get("id", None)
         slug = query.get("slug", None)

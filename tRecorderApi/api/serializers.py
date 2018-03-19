@@ -1,5 +1,6 @@
-from api.models import Language, Book, Take, Comment, Chapter, Chunk, Project, Anthology, Version, Mode
+from api.models import Language, Book, Take, Comment, Chapter, Chunk, Project, Anthology, Version, Mode, User
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -56,13 +57,13 @@ class ChunkSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class UserSerializer(serializers.ModelSerializer):
-#     """Serializer to map the Model instance into JSON format."""
+class UserSerializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         """Meta class to map serializer's fields with the model fields."""
-#         model = User
-#         fields = '__all__'
+    class Meta:
+        model = get_user_model()
+        exclude = ('is_staff', 'is_active', 'date_joined', 'password',
+                   'last_login', 'user_permissions', 'groups', 'is_superuser',)
+
 
 class TakeSerializer(serializers.ModelSerializer):
     """Serializer to map the Model instance into JSON format."""
@@ -129,6 +130,7 @@ class ModeSerializer(serializers.ModelSerializer):
         """Meta class to map serializer's fields with the model fields."""
         model = Mode
         fields = '__all__'
+
 
 class ExcludeFilesSerializer(serializers.ModelSerializer):
 

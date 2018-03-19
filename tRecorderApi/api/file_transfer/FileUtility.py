@@ -97,9 +97,14 @@ class FileUtility:
 
     @staticmethod
     def open_manifest_file(directory):
-        manifest_path = os.path.join(directory, 'manifest.json')
-        manifest = json.load(open(manifest_path))
-        return manifest
+
+        try:
+            manifest_path = os.path.join(directory, 'manifest.json')
+            manifest = json.load(open(manifest_path))
+            return manifest
+        except FileNotFoundError:
+            shutil.rmtree(directory)
+            logger.error("File Not Found: ", manifest_path)
 
     @staticmethod
     def push_audio_processing_to_background(take):
