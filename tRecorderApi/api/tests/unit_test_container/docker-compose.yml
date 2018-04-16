@@ -1,0 +1,9 @@
+version: '2'
+services:
+  db:
+    image: postgres
+    container_name: te-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres

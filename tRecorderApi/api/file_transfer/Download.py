@@ -1,4 +1,8 @@
+import datetime
+import os
+
 from .FileTransfer import FileTransfer
+from api.tasks import download_project
 
 
 class Download(FileTransfer):
@@ -6,10 +10,9 @@ class Download(FileTransfer):
         super().__init__(archive_project, audio_utility, file_utility)
 
     def download(self, project_name, location_list, root_dir, file_format):
-        self.file_utility.copy_files_from_src_to_dest(location_list)
+        title = "Download project"
+        started = datetime.datetime.now()
+        task = download_project.delay(self, project_name, root_dir, location_list, file_format, title, started)
 
-        converted_list = self.audio_utility.convert_to_mp3(root_dir, file_format)
+        return task.id
 
-        project_file = self.file_utility.project_file(project_name, 'media/export', '.zip')
-
-        return self.archive_project.archive(root_dir, project_file, converted_list, self.file_utility.remove_dir)

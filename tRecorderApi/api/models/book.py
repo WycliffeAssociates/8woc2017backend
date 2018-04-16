@@ -27,4 +27,3 @@ class Book(models.Model):
             }
         )
         return book_obj
-

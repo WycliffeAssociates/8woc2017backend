@@ -1,5 +1,5 @@
-from api.models import Take
-from api.serializers import ExcludeFilesSerializer
+from ..models import Take
+from ..serializers import ExcludeFilesSerializer
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema

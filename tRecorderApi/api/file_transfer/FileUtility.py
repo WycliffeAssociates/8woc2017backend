@@ -1,29 +1,36 @@
+import datetime
 import json
+import logging
 import os
-import pickle
 import shutil
 import subprocess
 import time
-import urllib.error
-import urllib.request
 import uuid
-from platform import system as system_name
-from raven.contrib.django.raven_compat.models import client
-from ..models.language import Language
-from ..models.book import Book
-from ..models.anthology import Anthology
-from ..models.version import Version
-from ..models.mode import Mode
-from ..models.project import Project
-from ..models.chapter import Chapter
-from ..models.chunk import Chunk
-import logging
 
-import urllib3
-
-from ..file_transfer.tinytag import TinyTag
+from api.file_transfer.tinytag import TinyTag
+from api.models.anthology import Anthology
+from api.models.book import Book
+from api.models.chapter import Chapter
+from api.models.chunk import Chunk
+from api.models.language import Language
+from api.models.mode import Mode
+from api.models.project import Project
+from api.models.version import Version
 
 logger = logging.getLogger(__name__)
+
+class CleanupType:
+    TAKE = 1
+    COMMENT = 2
+    NAME_AUDIO = 3
+    EXPORT = 4
+
+
+class CleanupType:
+    TAKE = 1
+    COMMENT = 2
+    NAME_AUDIO = 3
+    EXPORT = 4
 
 
 class FileUtility:
@@ -42,11 +49,12 @@ class FileUtility:
             os.makedirs(root_directory)
         return root_directory
 
-    def copy_files_from_src_to_dest(self, location_list):
+    @staticmethod
+    def copy_files_from_src_to_dest(location_list):
         for location in location_list:
             shutil.copy2(location["src"], location["dst"])
 
-    def import_project(self, directory):
+    def import_project(self, directory, task, title, started):
         bad_files = []
         project_manifest = self.open_manifest_file(directory)
         language = Language.import_language(project_manifest["language"])
@@ -56,6 +64,12 @@ class FileUtility:
         mode = Mode.import_mode(project_manifest["mode"])
         project = Project.import_project(
             version, mode, anthology, language, book)
+
+        title = project_manifest["language"]["name"] + " - " + \
+            project_manifest["book"]["name"]
+        total_takes = self.manifest_takes_count(project_manifest["manifest"])
+        takes_added = 0
+        current_take = 0
 
         for chapters in project_manifest["manifest"]:
             number = chapters["chapter"]
@@ -70,9 +84,28 @@ class FileUtility:
                 for take in chunks["takes"]:
                     from ..models.take import Take
                     file = os.path.join(directory, take["name"])
+
+                    current_take += 1
+                    task.update_state(state='PROGRESS',
+                                      meta={
+                                          'current': current_take,
+                                          'total': total_takes,
+                                          'name': task.name,
+                                          'started': started,
+                                          'title': title,
+                                          'message': 'Adding takes to database...',
+                                          'details': {
+                                              'lang_slug': project_manifest["language"]["slug"],
+                                              'lang_name': project_manifest["language"]["name"],
+                                              'book_slug': project_manifest["book"]["slug"],
+                                              'book_name': project_manifest["book"]["name"],
+                                              'result': take["name"],
+                                          }
+                                      })
+
                     try:
                         meta = TinyTag.get(file)
-                    except Exception as e:
+                    except Exception:
                         os.remove(file)
                         bad_files.append(take["name"])
                         continue
@@ -81,10 +114,27 @@ class FileUtility:
                     rating = take["rating"]
                     duration = meta.duration
                     self.push_audio_processing_to_background(file)
-                    Take.import_takes(FileUtility.relative_path(file), duration, markers, rating, chunk)
+                    Take.import_takes(self.relative_path(file), duration, markers, rating, chunk)
+                    takes_added += 1
+
+        add_info = ""
         if len(bad_files) > 0:
-            return bad_files, 202
-        return 'ok', 200
+            add_info = 'Bad files: ' + ', '.join(bad_files)
+
+        return {
+            'name': task.name,
+            'started': started,
+            'finished': datetime.datetime.now(),
+            'title': title,
+            'message': 'Upload complete!',
+            'details': {
+                'lang_slug': project_manifest["language"]["slug"],
+                'lang_name': project_manifest["language"]["name"],
+                'book_slug': project_manifest["book"]["slug"],
+                'book_name': project_manifest["book"]["name"],
+                'result': "Imported {0} files of {1}. {2}".format(takes_added, total_takes, add_info),
+            }
+        }
 
     @staticmethod
     def get_markers(meta):
@@ -97,9 +147,22 @@ class FileUtility:
 
     @staticmethod
     def open_manifest_file(directory):
-        manifest_path = os.path.join(directory, 'manifest.json')
-        manifest = json.load(open(manifest_path))
-        return manifest
+        try:
+            manifest_path = os.path.join(directory, 'manifest.json')
+            manifest = json.load(open(manifest_path))
+            return manifest
+        except Exception as e:
+            shutil.rmtree(directory)
+            logger.error("Error: ", e.message)
+
+    @staticmethod
+    def manifest_takes_count(manifest):
+        takes_count = 0
+        for chapters in manifest:
+            for chunks in chapters["chunks"]:
+                takes_count += len(chunks["takes"])
+
+        return takes_count
 
     @staticmethod
     def push_audio_processing_to_background(take):
@@ -133,6 +196,18 @@ class FileUtility:
             except Exception as e:
                 shutil.rmtree(directory)
                 return str(e), 400
+
+    @staticmethod
+    def convert_and_compress(file_transfer, takes, file_format):
+        files_list = []
+        for take in takes:
+            path, take_contents = file_transfer.audio_utility.convert_in_memory(take, file_format)
+            files_list.append({
+                "file_path": path,
+                "file_contents": take_contents
+            })
+
+        return file_transfer.archive_project.archive_in_memory(files_list)
 
     def create_path(self, root_dir, lang_slug, version, book_slug, chapter_number):
         path = os.path.join(root_dir, lang_slug, version,
@@ -168,10 +243,29 @@ class FileUtility:
     def relative_path(location):
         return os.path.relpath(location, os.path.dirname("tRecorderApi"))
 
-    def copy_files_from_src_to_dest(self, location_list):
+    @staticmethod
+    def file_name(location):
+        return os.path.basename(location)
 
+    def copy_files_from_src_to_dest(self, location_list, task, title, started):
+        current_take = 0
         for location in location_list:
             shutil.copy2(location["src"], location["dst"])
+
+            current_take += 1
+            progress = int((current_take / len(location_list) * 100) / 3)  # 1/3 of overall task
+            task.update_state(state='PROGRESS',
+                              meta={
+                                  'current': progress,
+                                  'total': 100,
+                                  'name': task.name,
+                                  'started': started,
+                                  'title': title,
+                                  'message': 'Copying takes...',
+                                  'details': {
+                                      'result': location["fn"],
+                                  }
+                              })
 
     def copy_files(self, src, dst):
         base_dir = os.path.dirname(os.path.dirname(
@@ -212,3 +306,83 @@ class FileUtility:
     def check_if_path_exists(path):
         path_exist = os.path.exists(path)
         return path_exist
+
+    def __cleanup_files(self, cleanup_type):
+        fs_records = []
+        db_records = []
+
+        if cleanup_type == CleanupType.TAKE:
+            from ..models import Take
+            target_dir = ['media', 'dump']
+            file_format = ".wav"
+
+            takes = Take.objects.all()
+            for take in takes:
+                db_records.append(take.location)
+        elif cleanup_type == CleanupType.COMMENT:
+            from ..models import Comment
+            target_dir = ['media', 'dump', 'comments']
+            file_format = ".mp3"
+
+            comments = Comment.objects.all()
+            for comment in comments:
+                db_records.append(comment.location)
+        elif cleanup_type == CleanupType.NAME_AUDIO:
+            from ..models import User
+            target_dir = ['media', 'dump', 'name_audios']
+            file_format = ".mp3"
+
+            users = User.objects.all()
+            for user in users:
+                if user.name_audio != "":
+                    db_records.append(user.name_audio)
+        elif cleanup_type == CleanupType.EXPORT:
+            target_dir = ['media', 'export']
+            file_format = ".zip"
+        else:
+            return 0
+
+        directory = ''
+        for dir in target_dir:
+            directory = os.path.join(directory, dir)
+        base_dir = os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))))
+        root_directory = os.path.join(base_dir, directory)
+
+        for subdir, dirs, files in os.walk(root_directory):
+            for file in files:
+                filepath = os.path.join(subdir, file)
+
+                if filepath.endswith(file_format):
+                    if cleanup_type != CleanupType.EXPORT:
+                        fs_records.append(self.relative_path(filepath))
+                    else:
+                        mtime = os.path.getmtime(filepath)
+                        last_modified_date = datetime.datetime.fromtimestamp(mtime)
+                        diff = datetime.datetime.now() - last_modified_date
+                        # Include files for deletion older than 24 hours
+                        if diff.seconds > 24*60*60:
+                            fs_records.append(self.relative_path(filepath))
+
+        orphans = frozenset(fs_records).difference(db_records)
+
+        for location in orphans:
+            filename = os.path.join(base_dir, location)
+            if os.path.isfile(filename):
+                self.remove_file(filename)
+
+        return len(orphans)
+
+    def cleanup_orphans(self):
+        total_removed = 0
+
+        # cleanup takes
+        total_removed += self.__cleanup_files(CleanupType.TAKE)
+        # cleanup comments
+        total_removed += self.__cleanup_files(CleanupType.COMMENT)
+        # cleanup user name audios
+        total_removed += self.__cleanup_files(CleanupType.NAME_AUDIO)
+        # cleanup old (24 hours) zip files in export folder
+        total_removed += self.__cleanup_files(CleanupType.EXPORT)
+
+        return total_removed

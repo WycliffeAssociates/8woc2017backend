@@ -1,5 +1,4 @@
 import json
-import os
 
 from pydub import AudioSegment
 
@@ -8,26 +7,41 @@ class AudioUtility:
     def high_pass_filter(self):
         pass
 
-    def convert_to_mp3(self, root_directory, file_format):
-        converted_mp3_list = []
-        for subdir, dirs, files in os.walk(root_directory):
-            for file in files:
-                file_path = os.path.join(subdir, file)
-                if file_format == 'mp3':
-                    if file_path.endswith(".wav"):
-                        sound = AudioSegment.from_wav(file_path)
+    def convert_to_mp3(self, location_list, file_format, task, title, started):
+        current_take = 0
 
-                        filename = file_path.replace(".wav", ".mp3")
+        for i, take in enumerate(location_list):
+            file_path = take["dst"] + "/" + take["fn"]
+            if file_format == 'mp3':
+                if file_path.endswith(".wav"):
+                    sound = AudioSegment.from_wav(file_path)
+                    file_path = file_path.replace(".wav", ".mp3")
+                    sound.export(file_path, format="mp3")
 
-                        sound.export(filename, format="mp3")
-
-                        # Add to array so it can be added to the archive
-                        converted_mp3_list.append(filename)
-                    else:
-                        converted_mp3_list.append(filename)
+                    # Converted file path
+                    location_list[i]["conv"] = file_path
                 else:
-                    converted_mp3_list.append(file_path)
-        return converted_mp3_list
+                    location_list[i]["conv"] = file_path
+            else:
+                location_list[i]["conv"] = file_path
+
+            current_take += 1
+
+            progress = int(((current_take / len(location_list) * 100) / 3) + (100 / 3))  # 2/3 of overall task
+            task.update_state(state='PROGRESS',
+                              meta={
+                                  'current': progress,
+                                  'total': 100,
+                                  'name': task.name,
+                                  'started': started,
+                                  'title': title,
+                                  'message': 'Converting takes...',
+                                  'details': {
+                                      'result': take["fn"],
+                                  }
+                              })
+
+        return location_list
 
     def write_meta(self, file_path, file_path_mp3, meta):
         sound = AudioSegment.from_wav(file_path)

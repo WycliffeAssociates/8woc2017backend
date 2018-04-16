@@ -8,3 +8,5 @@ from .anthology import Anthology
 from .version import Version
 from .mode import Mode
 from .comment import Comment
+from .user import User
+from .task import Task

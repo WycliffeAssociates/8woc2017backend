@@ -1,15 +1,15 @@
-from api.models import Take
+from ..models import Take
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 
-from api.serializers import TakeForZipSerializer
+from ..serializers import TakeForZipSerializer
 
-from api.file_transfer.ArchiveIt import ArchiveIt
-from api.file_transfer.AudioUtility import AudioUtility
-from api.file_transfer.Download import Download
-from api.file_transfer.FileUtility import FileUtility
+from ..file_transfer.ArchiveIt import ArchiveIt
+from ..file_transfer.AudioUtility import AudioUtility
+from ..file_transfer.Download import Download
+from ..file_transfer.FileUtility import FileUtility
 from rest_framework.response import Response
 
 

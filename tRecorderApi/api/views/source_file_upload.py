@@ -5,13 +5,13 @@ import subprocess
 import time
 import uuid
 
-from api.models import Language, Book, Take
+from ..file_transfer import FileUtility
+from ..file_transfer import TinyTag
+from ..models import Language, Book, Take
 from django.conf import settings
-from api.file_transfer import FileUtility
 from rest_framework import views
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
-from api.file_transfer import TinyTag
 
 
 class UploadSourceFileView(views.APIView):

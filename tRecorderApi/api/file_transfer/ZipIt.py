@@ -14,6 +14,6 @@ class ZipIt(ArchiveProject):
             zip_file.extractall(directory)
             zip_file.close()
             return 'ok', 200
-        except zipfile.BadZipfile:
-                return "bad zip file", 400
+        except zipfile.BadZipfile as e:
+                return e, 400
 

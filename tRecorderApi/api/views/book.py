@@ -1,9 +1,12 @@
-from api.models import Book
-from api.serializers import BookSerializer
+from ..models import Book
+from ..serializers import BookSerializer
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from django.core.exceptions import SuspiciousOperation
 
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
@@ -31,7 +34,9 @@ from rest_framework import viewsets
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    
     def build_params_filter(self, query):
         pk = query.get("id", None)
         slug = query.get("slug", None)
@@ -54,5 +59,6 @@ class BookViewSet(viewsets.ModelViewSet):
             filter = self.build_params_filter(self.request.query_params)
             if filter:
                 return queryset.filter(**filter)
-            return None
+            else:
+                raise SuspiciousOperation
         return queryset

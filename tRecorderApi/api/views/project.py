@@ -1,10 +1,13 @@
-from api.models import Project
-from api.serializers import ProjectSerializer
+from ..models import Project
+from ..serializers import ProjectSerializer
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+from ..permissions import IsStaffOrReadOnly
+from django.core.exceptions import SuspiciousOperation
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
     operation_description="Return list of projects based on given query string",
@@ -53,6 +56,7 @@ from rest_framework import viewsets
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    permission_classes = (IsStaffOrReadOnly,)
 
     def build_params_filter(self, query):
         pk = query.get("id", None)
@@ -85,5 +89,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
             filter = self.build_params_filter(self.request.query_params)
             if filter:
                 return queryset.filter(**filter)
-            return None
+            else:
+                raise SuspiciousOperation
         return queryset

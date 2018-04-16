@@ -1,0 +1,281 @@
+<testsuite errors="3" failures="32" name="Django Project Tests" skips="0" tests="58" time="9.452"><testcase classname="api.tests.api.test_anthologies.AnthologyApiTest" name="test_get_request_has_200_status_code" time="0.237447"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_anthologies.py", line 28, in test_get_request_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_anthologies.AnthologyApiTest" name="test_get_request_with_id_has_200_status_code" time="0.134516"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_anthologies.py", line 32, in test_get_request_with_id_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_anthologies.AnthologyApiTest" name="test_get_request_with_non_existent_id_has_404_status_code" time="0.149126"><failure message="401 != 404" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_anthologies.py", line 38, in test_get_request_with_non_existent_id_has_404_status_code
+    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+AssertionError: 401 != 404
+</failure></testcase><testcase classname="api.tests.api.test_anthologies.AnthologyApiTest" name="test_number_of_items_are_equal" time="0.150237" /><testcase classname="api.tests.api.test_anthologies.AnthologyApiTest" name="test_random_text_as_parameter_gives_400_status_code" time="0.145193"><failure message="401 != 400" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_anthologies.py", line 42, in test_random_text_as_parameter_gives_400_status_code
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+AssertionError: 401 != 400
+</failure></testcase><testcase classname="api.tests.api.test_anthologies.AnthologyApiTest" name="test_slug_equals_ot_as_parameter_has_len_one" time="0.117458" /><testcase classname="api.tests.api.test_books.BookApiTestCases" name="test_get_request_returns_ok" time="0.168298"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_books.py", line 57, in test_get_request_returns_ok
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_books.BookApiTestCases" name="test_get_request_with_id_returns_ok" time="0.170226"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_books.py", line 71, in test_get_request_with_id_returns_ok
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_books.BookApiTestCases" name="test_language_dependency" time="0.118253" /><testcase classname="api.tests.api.test_books.BookApiTestCases" name="test_null_url_returns_404" time="0.113289"><failure message="401 != 404" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_books.py", line 82, in test_null_url_returns_404
+    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+AssertionError: 401 != 404
+</failure></testcase><testcase classname="api.tests.api.test_books.BookApiTestCases" name="test_random_url_returns_400" time="0.116300"><failure message="401 != 400" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_books.py", line 94, in test_random_url_returns_400
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+AssertionError: 401 != 400
+</failure></testcase><testcase classname="api.tests.api.test_books.BookApiTestCases" name="test_response_length" time="0.173340" /><testcase classname="api.tests.api.test_chapters.ChapterApiTest" name="test_get_request_has_200_status_code" time="0.223964"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_chapters.py", line 53, in test_get_request_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_chapters.ChapterApiTest" name="test_get_request_with_non_existent_id_has_404_status_code" time="0.240162"><failure message="401 != 404" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_chapters.py", line 59, in test_get_request_with_non_existent_id_has_404_status_code
+    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+AssertionError: 401 != 404
+</failure></testcase><testcase classname="api.tests.api.test_chapters.ChapterApiTest" name="test_number_of_items_are_equal" time="0.173090" /><testcase classname="api.tests.api.test_chapters.ChapterApiTest" name="test_random_text_as_parameter_gives_400_status_code" time="0.165211"><failure message="401 != 400" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_chapters.py", line 63, in test_random_text_as_parameter_gives_400_status_code
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+AssertionError: 401 != 400
+</failure></testcase><testcase classname="api.tests.api.test_chapters.ChapterApiTest" name="test_response_contains_project" time="0.188005"><failure message="'project' not found in &quot;{'detail': ErrorDetail(string='Authentication credentials were not provided.', code='not_authenticated')}&quot;" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_chapters.py", line 75, in test_response_contains_project
+    self.assertIn("project", str(response.data))
+AssertionError: 'project' not found in "{'detail': ErrorDetail(string='Authentication credentials were not provided.', code='not_authenticated')}"
+</failure></testcase><testcase classname="api.tests.api.test_chunks.ChunkApiTest" name="test_get_request_has_200_status_code" time="0.164390"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_chunks.py", line 52, in test_get_request_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_chunks.ChunkApiTest" name="test_get_request_with_id_has_200_status_code" time="0.154570"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_chunks.py", line 56, in test_get_request_with_id_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_chunks.ChunkApiTest" name="test_get_request_with_non_existent_id_has_404_status_code" time="0.190812"><failure message="401 != 404" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_chunks.py", line 62, in test_get_request_with_non_existent_id_has_404_status_code
+    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+AssertionError: 401 != 404
+</failure></testcase><testcase classname="api.tests.api.test_chunks.ChunkApiTest" name="test_number_of_items_are_equal" time="0.225461" /><testcase classname="api.tests.api.test_chunks.ChunkApiTest" name="test_random_text_as_parameter_gives_400_status_code" time="0.146342"><failure message="401 != 400" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_chunks.py", line 66, in test_random_text_as_parameter_gives_400_status_code
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+AssertionError: 401 != 400
+</failure></testcase><testcase classname="api.tests.api.test_comments.CommentApiTest" name="test_get_request_has_200_status_code" time="0.180245"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_comments.py", line 58, in test_get_request_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_comments.CommentApiTest" name="test_get_request_with_id_has_200_status_code" time="0.173548"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_comments.py", line 62, in test_get_request_with_id_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_comments.CommentApiTest" name="test_get_request_with_non_existent_id_has_404_status_code" time="0.166028"><failure message="401 != 404" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_comments.py", line 68, in test_get_request_with_non_existent_id_has_404_status_code
+    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+AssertionError: 401 != 404
+</failure></testcase><testcase classname="api.tests.api.test_comments.CommentApiTest" name="test_number_of_items_are_equal" time="0.173423" /><testcase classname="api.tests.api.test_comments.CommentApiTest" name="test_random_text_as_parameter_gives_400_status_code" time="0.170033"><failure message="401 != 400" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_comments.py", line 72, in test_random_text_as_parameter_gives_400_status_code
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+AssertionError: 401 != 400
+</failure></testcase><testcase classname="api.tests.api.test_languages.LanguageApiTest" name="test_get_request_has_200_status_code" time="0.112302"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_languages.py", line 28, in test_get_request_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_languages.LanguageApiTest" name="test_get_request_with_id_has_200_status_code" time="0.122881"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_languages.py", line 32, in test_get_request_with_id_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_languages.LanguageApiTest" name="test_get_request_with_non_existent_id_has_404_status_code" time="0.110817"><failure message="401 != 404" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_languages.py", line 38, in test_get_request_with_non_existent_id_has_404_status_code
+    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+AssertionError: 401 != 404
+</failure></testcase><testcase classname="api.tests.api.test_languages.LanguageApiTest" name="test_number_of_items_are_equal" time="0.119443" /><testcase classname="api.tests.api.test_languages.LanguageApiTest" name="test_random_text_as_parameter_gives_400_status_code" time="0.114980"><failure message="401 != 400" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_languages.py", line 42, in test_random_text_as_parameter_gives_400_status_code
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+AssertionError: 401 != 400
+</failure></testcase><testcase classname="api.tests.api.test_languages.LanguageApiTest" name="test_slug_equals_en_x_demo_as_parameter_has_len_one" time="0.122058" /><testcase classname="api.tests.api.test_modes.ModesApiTest" name="test_get_request_has_200_status_code" time="0.137165"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_modes.py", line 29, in test_get_request_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_modes.ModesApiTest" name="test_get_request_with_id_has_200_status_code" time="0.155345"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_modes.py", line 33, in test_get_request_with_id_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_modes.ModesApiTest" name="test_get_request_with_non_existent_id_has_404_status_code" time="0.137012"><failure message="401 != 404" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_modes.py", line 39, in test_get_request_with_non_existent_id_has_404_status_code
+    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+AssertionError: 401 != 404
+</failure></testcase><testcase classname="api.tests.api.test_modes.ModesApiTest" name="test_number_of_items_are_equal" time="0.153854" /><testcase classname="api.tests.api.test_modes.ModesApiTest" name="test_random_text_as_parameter_gives_400_status_code" time="0.140460"><failure message="401 != 400" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_modes.py", line 43, in test_random_text_as_parameter_gives_400_status_code
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+AssertionError: 401 != 400
+</failure></testcase><testcase classname="api.tests.api.test_modes.ModesApiTest" name="test_slug_equals_en_x_demo_as_parameter_has_len_one" time="0.143747" /><testcase classname="api.tests.api.test_projects.ProjectsApiTest" name="test_get_request_has_200_status_code" time="0.227857" /><testcase classname="api.tests.api.test_projects.ProjectsApiTest" name="test_get_request_with_id_has_200_status_code" time="0.249317" /><testcase classname="api.tests.api.test_projects.ProjectsApiTest" name="test_get_request_with_non_existent_id_has_404_status_code" time="0.196357" /><testcase classname="api.tests.api.test_projects.ProjectsApiTest" name="test_number_of_items_are_equal" time="0.236911" /><testcase classname="api.tests.api.test_projects.ProjectsApiTest" name="test_random_text_as_parameter_gives_400_status_code" time="0.179380" /><testcase classname="api.tests.api.test_takes.TakesApiTest" name="test_get_request_returns_ok" time="0.220047"><error message="invalid literal for int() with base 10: 'e1'" type="builtins.ValueError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_takes.py", line 73, in test_get_request_returns_ok
+    response = self.client.get('/api/takes/')
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 292, in get
+    response = super(APIClient, self).get(path, data=data, **extra)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 209, in get
+    return self.generic('GET', path, **r)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 238, in generic
+    method, path, data, content_type, secure, **extra)
+  File "/usr/local/lib/python3.6/site-packages/django/test/client.py", line 416, in generic
+    return self.request(**r)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 289, in request
+    return super(APIClient, self).request(**kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 241, in request
+    request = super(APIRequestFactory, self).request(**kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/test/client.py", line 501, in request
+    six.reraise(*exc_info)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/six.py", line 686, in reraise
+    raise value
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/viewsets.py", line 103, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/decorators.py", line 67, in _wrapper
+    return bound_func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/decorators.py", line 63, in bound_func
+    return func.__get__(self, type(self))(*args2, **kwargs2)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/mixins.py", line 48, in list
+    return Response(serializer.data)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 765, in data
+    ret = super(ListSerializer, self).data
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 262, in data
+    self._data = self.to_representation(self.instance)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 683, in to_representation
+    self.child.to_representation(item) for item in iterable
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 683, in &lt;listcomp&gt;
+    self.child.to_representation(item) for item in iterable
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 527, in to_representation
+    ret[field.field_name] = field.to_representation(attribute)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/fields.py", line 944, in to_representation
+    return int(value)
+ValueError: invalid literal for int() with base 10: 'e1'
+</error></testcase><testcase classname="api.tests.api.test_takes.TakesApiTest" name="test_get_request_with_id" time="0.208959"><error message="invalid literal for int() with base 10: 'e1'" type="builtins.ValueError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_takes.py", line 85, in test_get_request_with_id
+    response = self.client.get('/api/takes/' + str(self.take.id) + '/')
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 292, in get
+    response = super(APIClient, self).get(path, data=data, **extra)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 209, in get
+    return self.generic('GET', path, **r)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 238, in generic
+    method, path, data, content_type, secure, **extra)
+  File "/usr/local/lib/python3.6/site-packages/django/test/client.py", line 416, in generic
+    return self.request(**r)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 289, in request
+    return super(APIClient, self).request(**kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 241, in request
+    request = super(APIRequestFactory, self).request(**kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/test/client.py", line 501, in request
+    six.reraise(*exc_info)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/six.py", line 686, in reraise
+    raise value
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/viewsets.py", line 103, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/mixins.py", line 58, in retrieve
+    return Response(serializer.data)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 560, in data
+    ret = super(Serializer, self).data
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 262, in data
+    self._data = self.to_representation(self.instance)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 527, in to_representation
+    ret[field.field_name] = field.to_representation(attribute)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/fields.py", line 944, in to_representation
+    return int(value)
+ValueError: invalid literal for int() with base 10: 'e1'
+</error></testcase><testcase classname="api.tests.api.test_takes.TakesApiTest" name="test_null_get_request" time="0.206490" /><testcase classname="api.tests.api.test_takes.TakesApiTest" name="test_random_parameter_in_url" time="0.207356" /><testcase classname="api.tests.api.test_takes.TakesApiTest" name="test_rating_is_updated" time="0.190261"><error message="invalid literal for int() with base 10: 'e1'" type="builtins.ValueError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_takes.py", line 122, in test_rating_is_updated
+    self.client.patch('/api/takes/' + str(self.take.id) +'/', {"rating": 1})
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 316, in patch
+    path, data=data, format=format, content_type=content_type, **extra)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 221, in patch
+    return self.generic('PATCH', path, data, content_type, **extra)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 238, in generic
+    method, path, data, content_type, secure, **extra)
+  File "/usr/local/lib/python3.6/site-packages/django/test/client.py", line 416, in generic
+    return self.request(**r)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 289, in request
+    return super(APIClient, self).request(**kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/test.py", line 241, in request
+    request = super(APIRequestFactory, self).request(**kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/test/client.py", line 501, in request
+    six.reraise(*exc_info)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/six.py", line 686, in reraise
+    raise value
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/viewsets.py", line 103, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/decorators.py", line 67, in _wrapper
+    return bound_func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/decorators.py", line 63, in bound_func
+    return func.__get__(self, type(self))(*args2, **kwargs2)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/mixins.py", line 84, in partial_update
+    return self.update(request, *args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/mixins.py", line 77, in update
+    return Response(serializer.data)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 560, in data
+    ret = super(Serializer, self).data
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 262, in data
+    self._data = self.to_representation(self.instance)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/serializers.py", line 527, in to_representation
+    ret[field.field_name] = field.to_representation(attribute)
+  File "/usr/local/lib/python3.6/site-packages/rest_framework/fields.py", line 944, in to_representation
+    return int(value)
+ValueError: invalid literal for int() with base 10: 'e1'
+</error></testcase><testcase classname="api.tests.api.test_versions.VersionApiTest" name="test_get_request_has_200_status_code" time="0.096888"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_versions.py", line 28, in test_get_request_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_versions.VersionApiTest" name="test_get_request_with_id_has_200_status_code" time="0.147486"><failure message="401 != 200" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_versions.py", line 32, in test_get_request_with_id_has_200_status_code
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+AssertionError: 401 != 200
+</failure></testcase><testcase classname="api.tests.api.test_versions.VersionApiTest" name="test_get_request_with_non_existent_id_has_404_status_code" time="0.114995"><failure message="401 != 404" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_versions.py", line 38, in test_get_request_with_non_existent_id_has_404_status_code
+    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+AssertionError: 401 != 404
+</failure></testcase><testcase classname="api.tests.api.test_versions.VersionApiTest" name="test_number_of_items_are_equal" time="0.145165" /><testcase classname="api.tests.api.test_versions.VersionApiTest" name="test_random_text_as_parameter_gives_400_status_code" time="0.112758"><failure message="401 != 400" type="builtins.AssertionError">Traceback (most recent call last):
+  File "/tE-backend/tRecorderApi/api/tests/api/test_versions.py", line 42, in test_random_text_as_parameter_gives_400_status_code
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+AssertionError: 401 != 400
+</failure></testcase><testcase classname="api.tests.api.test_versions.VersionApiTest" name="test_slug_equals_en_x_demo_as_parameter_has_len_one" time="0.102964" /><testcase classname="api.tests.test_books.BookModelTestCases" name="test_serializer_ouput" time="0.018501" /><testcase classname="api.tests.test_get_projects.GetProjectsTestCases" name="test_keys_in_project" time="0.091162" /><testcase classname="api.tests.test_upload.UploadTestCases" name="test_create_root_directory" time="0.034483" /></testsuite>

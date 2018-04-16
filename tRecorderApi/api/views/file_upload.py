@@ -1,18 +1,14 @@
+import logging
+
 from django.core.files.storage import FileSystemStorage
 from rest_framework import views
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 
-from api.file_transfer.FileUtility import FileUtility
-from api.file_transfer.TrIt import TrIt
-from api.file_transfer.Upload import Upload
-from api.file_transfer.ZipIt import ZipIt
-from api.models import Take
-from rest_framework import views
-from rest_framework.parsers import FileUploadParser
-from rest_framework.response import Response
-import logging
-from raven.contrib.django.raven_compat.models import client
+from ..file_transfer.FileUtility import FileUtility
+from ..file_transfer.TrIt import TrIt
+from ..file_transfer.Upload import Upload
+from ..file_transfer.ZipIt import ZipIt
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -33,7 +29,7 @@ class FileUploadView(views.APIView):
             if filename == "tr":
                 arch_project = TrIt()
             up = Upload(arch_project, None, FileUtility())
-            up.upload(uploaded_file_url)
-            return Response({"response": "processing"}, status=202)
+            task_id = up.upload(uploaded_file_url)
+            return Response({"response": "processing", "task_id": task_id}, status=202)
         else:
             return Response({"response": "no file"}, status=200)

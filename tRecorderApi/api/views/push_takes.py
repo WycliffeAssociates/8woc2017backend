@@ -1,15 +1,16 @@
 import io
+import os
 import zipfile
-from django.core import files
+
+from django.conf import settings
 from django.http import HttpResponse
 from rest_framework import views
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from api.models import Chunk
+
 from .helpers import getFileName, md5Hash, getFilePath
-from api.file_transfer import FileUtility
-from django.conf import settings
-import os
+from ..file_transfer import FileUtility
+from ..models import Chunk
 
 
 class PushTakesView(views.APIView):

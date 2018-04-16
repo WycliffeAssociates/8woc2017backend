@@ -1,20 +1,16 @@
-from rest_framework import views, status
-from rest_framework.parsers import JSONParser
-import time
-import uuid
+import json
 import os
 import shutil
-import pydub
-import json
 import subprocess
-from rest_framework.response import Response
-from django.http import HttpResponse
-from django.core import files
-from rest_framework.parsers import JSONParser, FileUploadParser
-from api.file_transfer import TinyTag
-import pickle
-from api.models import Take, Chunk
+import time
+import uuid
+
+import pydub
+from ..models import Chunk
 from django.conf import settings
+from rest_framework import views
+from rest_framework.parsers import JSONParser
+from rest_framework.response import Response
 
 
 class SourceFileView(views.APIView):
@@ -88,7 +84,7 @@ class SourceFileView(views.APIView):
                 subprocess.call(
                     ['java', '-jar', os.path.join(
                         settings.BASE_DIR, 'aoh/aoh.jar'), '-c', '-tr', root_folder],
-                                stdout=FNULL, stderr=subprocess.STDOUT)
+                    stdout=FNULL, stderr=subprocess.STDOUT)
                 FNULL.close()
                 os.rename(root_folder + '.tr',
                           os.path.join(settings.BASE_DIR, 'media/tmp/' + filename + '.tr'))
@@ -99,6 +95,7 @@ class SourceFileView(views.APIView):
             return Response({"response": "no_source_files"}, status=400)
 
         return Response({"location": 'media/tmp/' + filename + '.tr'}, status=200)
+
 
 # code flow
 """

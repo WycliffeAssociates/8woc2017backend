@@ -17,6 +17,10 @@ from .source_file import *
 from .source_file_upload import *
 from .stitch_takes import *
 from .take import *
-from .zip import  ZipViewSet
+from .zip import ZipViewSet
 from .tr import TrViewSet
 from .frontend import FrontendAppView
+from .user import UserViewSet
+
+from .clean_orphans import *
+from .task import TaskViewSet

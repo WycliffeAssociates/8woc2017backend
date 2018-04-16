@@ -21,7 +21,7 @@ from rest_framework.response import Response
         ), openapi.Parameter(
             name='file_format', in_=openapi.IN_QUERY,
             type=openapi.TYPE_STRING,
-            description="It can be .mp3 or .wav",
+            description="It can be 'mp3' or 'wav'",
         )
     ]
 ))
@@ -37,24 +37,37 @@ class ZipViewSet(viewsets.ReadOnlyModelViewSet):
         file_format = self.request.query_params.get('file_format')
         if id is None:
             id = kwargs.get("pk", None)
-        projects = Take.objects.filter(chunk__chapter__project=id)
+        takes = Take.objects.filter(chunk__chapter__project=id)
 
-        language_slug = projects[0].chunk.chapter.project.language.slug
-        book_slug = projects[0].chunk.chapter.project.book.slug
-        version_slug = projects[0].chunk.chapter.project.version.slug
-
+        language_slug = takes[0].chunk.chapter.project.language.slug
+        book_slug = takes[0].chunk.chapter.project.book.slug
+        version_slug = takes[0].chunk.chapter.project.version.slug
         project_name = language_slug + "_" + version_slug + "_" + book_slug
+
         zip_it = Download(ArchiveIt(), AudioUtility(), FileUtility())
 
         root_dir = zip_it.file_utility.root_dir(['media', 'export'])
         take_location_list = []
-        for project in projects:
-            location = {}
-            location['src'] = project.location
-            location['dst'] = zip_it.file_utility.create_path(root_dir, language_slug, version_slug,
-                                                              book_slug,
-                                                              str(project.chunk.chapter).zfill(2))
+        take_names_list = []
+        for take in takes:
+            file_name = zip_it.file_utility.file_name(take.location)
+            if file_name in take_names_list:
+                continue
+
+            take_names_list.append(file_name)
+
+            location = {
+                "fn": file_name,
+                "src": take.location,
+                "dst": zip_it.file_utility.create_path(
+                    root_dir,
+                    language_slug,
+                    version_slug,
+                    book_slug,
+                    str(take.chunk.chapter).zfill(2))
+            }
             take_location_list.append(location)
-        zipped_file_location = zip_it.download(project_name, take_location_list, root_dir, file_format)
-        path = {"location": zip_it.file_utility.relative_path(zipped_file_location)}
-        return Response(path)
+
+        task_id = zip_it.download(project_name, take_location_list, root_dir, file_format)
+        return Response({"response": "processing", "task_id": task_id}, status=202)
+

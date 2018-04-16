@@ -15,23 +15,32 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+import os
 
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
+if os.environ.get('TESTING') != 'True':
+    from drf_yasg.views import get_schema_view
+    from drf_yasg import openapi
+    from rest_framework import permissions
 
-schema_view = get_schema_view(
-   openapi.Info(
-      title="tE API DOC",
-      default_version='v1',
-      description="Test description",
-   ),
-   public=False,
-)
-
-urlpatterns = [
-    url(r'^docs/', schema_view.with_ui('swagger', cache_timeout=None), name='schema-swagger-ui'),
-    url(r'^', include('api.urls')),
-    url(r'^admin/', admin.site.urls),
-    url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
-
-]
+    schema_view = get_schema_view(
+        openapi.Info(
+            title="tE API DOC",
+            default_version='v1',
+            description="Test description",
+        ),
+        public=True,
+        permission_classes=(permissions.AllowAny,),
+    )
+    urlpatterns = [
+        url(r'^admin/', admin.site.urls),
+        url(r'^docs/', schema_view.with_ui('swagger', cache_timeout=None), name='schema-swagger-ui'),
+        url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
+        url(r'^', include('api.urls')),
+        url(r'^api/login/', include('rest_social_auth.urls_token')),
+    ]
+else:
+    urlpatterns = [
+        url(r'^admin/', admin.site.urls),
+        url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
+        url(r'^', include('api.urls')),
+    ]

@@ -10,8 +10,10 @@ app = Celery('tRecorderApi')
 # - namespace='CELERY' means all celery-related configuration keys
 #   should have a `CELERY_` prefix.
 app.config_from_object('django.conf:settings', namespace='CELERY')
-app.autodiscover_tasks()
 
+# workaround for the setting CELERY_TASK_RESULT_EXPIRES which doesn't work
+app.conf.result_expires = 604800  # store tasks results for 7 days (in seconds)
+app.autodiscover_tasks()
 
 @app.task(bind=True)
 def debug_task(self):
