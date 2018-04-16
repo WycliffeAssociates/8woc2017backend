@@ -8,11 +8,5 @@ coreapi
 urllib3
 whitenoise
 psycopg2
-raven
-celery
-redis
-django-celery-results
-flower
-drf-yasg
 django-jenkins
 coverage

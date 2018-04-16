@@ -4,9 +4,10 @@ from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
+from api.serializers import ChapterSerializer
+from django.core.exceptions import SuspiciousOperation
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
     operation_description="Return list of anthologies based on given query string",
@@ -63,5 +64,6 @@ class ChapterViewSet(viewsets.ModelViewSet):
             filter = self.build_params_filter(self.request.query_params)
             if filter:
                 return queryset.filter(**filter)
-            return None
+            else:
+                raise SuspiciousOperation
         return queryset
