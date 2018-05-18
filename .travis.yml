@@ -8,21 +8,37 @@ services:
   - docker
 git:
   depth: 1
-before_install:
-  - env
-install:
-  - cd tRecorderApi/api/tests/unit_test_container
-  - docker-compose -f test-runner.yml build test-runner
-script:
-  - docker-compose up -d
-  - docker ps -a
-  - docker-compose -f test-runner.yml run --rm test-runner
-after_script:
-  - docker-compose down
+addons:
+  sonarcloud:
+    organization: wa-github
+    token: "${SONAR_TOKEN}"
+jobs:
+  include:
+    - stage: test
+      before_install:
+        -env
+      install:
+      - cd tRecorderApi/api/tests/unit_test_container
+      - docker-compose -f test-runner.yml build test-runner
+    script:
+      - docker-compose -d
+      - docker ps -a
+      - docker-compose -f test-runner.yml run --rm test-runner
+    after_script:
+      - docker-compose down
+    - stage: sonar
+      python:
+        - '3.6'
+      install: true
+      script:
+        - sonar-scanner -Dsonar.projectKey=te-backend -Dsonar.sources=tRecorderApi/api
+stages:
+  - test
+  - name: sonar
+    if: type IN (push, cron)
 notifications:
   slack:
     rooms:
       secure: VlI+qqaiFynJqpKa7s923h06LAHxbMF7cgsi1n1FERczL6wdIZ7STAh5j3onj5xTblF/MMcxDDmSOouge4ZGyVgvtaEi+XHlqkTxFUXwotbttAkLzcL6/5OL4MH743AmqdDE+VubDn8WqKVo7mMumqUtm0wtHGg25hTClNGYIBqoXQ/QDnkvo0yD9kg9YOBkwiLOYBUH1wVUntQ4JkL5cW1DQMzbJGSX4Btixcv0zDYdpJ+ZtW+cZmKRQ3TJZP+K7/nlLByz/wYr3aI+lixJMq/1UYBnZJZl3brPHBFhyFJzvElTN+/jLoXMtlFS9IdEYuWTpC2uEna6aPVI9NsplN59k+v8S3q1ff37yfzvYGJXOhbx6ScPHyu0rp0WF3oXRL4/oOHRvWVBjDl9DAQcQ4dALtKdq2yR1/mwge1C51qn+B+2gv35offbtu0tbWHk2bkkrV/uahCL9AUIbYbizAluLPjCGcrEIGy+IIj0Za4cWph/D5bN11PRoI0j6jatdJXSW+xucy5mnJYEe3Uf3dBj+JVCMY5Haqgbn5vug/YhSdoLJgBMOgftpZ9pRfoOt5Mtk5YXbSfQZLLPUne1mCILG1zima1qhjerQ1c7ky+8HG7RzJv7pL6Ky524EgF+64l8ToyH5QwYyyHLv1MNDo6q9Oy9aMfYNROYFhDjiqk=
     on_success: change 
     on_failure: always
-
