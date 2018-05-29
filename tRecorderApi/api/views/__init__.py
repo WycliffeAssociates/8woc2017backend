@@ -17,6 +17,7 @@ from .source_file import *
 from .source_file_upload import *
 from .stitch_takes import *
 from .take import *
+from .transfer import TransferViewSet
 from .export import ExportViewSet
 from .tr import TrViewSet
 from .frontend import FrontendAppView
