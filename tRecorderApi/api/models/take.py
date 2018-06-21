@@ -63,3 +63,4 @@ class Take(models.Model):
                     owner=owner
                     )
         take.save()
+        return take

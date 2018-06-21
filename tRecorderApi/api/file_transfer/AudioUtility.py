@@ -10,20 +10,20 @@ class AudioUtility:
     def convert_to_mp3(self, location_list, file_format, project, user, update_progress, task_args):
         current_take = 0
 
-        for i, take in enumerate(location_list):
-            file_path = take["dst"] + "/" + take["fn"]
-            if file_format == 'mp3':
+        for i, file in enumerate(location_list):
+            file_path = file["dst"] + "/" + file["fname"]
+            if file_format == 'mp3' and file["type"] == "take":
                 if file_path.endswith(".wav"):
                     sound = AudioSegment.from_wav(file_path)
                     file_path = file_path.replace(".wav", ".mp3")
                     sound.export(file_path, format="mp3")
 
                     # Converted file path
-                    location_list[i]["conv"] = file_path
+                    location_list[i]["final"] = file_path
                 else:
-                    location_list[i]["conv"] = file_path
+                    location_list[i]["final"] = file_path
             else:
-                location_list[i]["conv"] = file_path
+                location_list[i]["final"] = file_path
 
             current_take += 1
 
@@ -38,7 +38,7 @@ class AudioUtility:
                     'lang_name': project["lang_name"],
                     'book_slug': project["book_slug"],
                     'book_name': project["book_name"],
-                    'result': take["fn"]
+                    'result': file["fname"]
                 })
                 update_progress(*new_task_args)
 

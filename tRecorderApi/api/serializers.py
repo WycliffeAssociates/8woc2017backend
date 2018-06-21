@@ -87,6 +87,7 @@ class TakeSerializer(serializers.ModelSerializer):
 class ChunkSerializer(serializers.ModelSerializer):
     """Serializer to map the Model instance into JSON format."""
     has_comment = serializers.BooleanField(default=False)
+    comments = CommentSerializer(many=True, read_only=True)
     published_take = TakeSerializer(many=False, read_only=True)
 
     class Meta:

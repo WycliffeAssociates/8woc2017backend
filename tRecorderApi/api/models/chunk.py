@@ -12,7 +12,7 @@ class Chunk(models.Model):
         on_delete=models.CASCADE,
         related_name='chunks'
     )
-    comments = GenericRelation("Comment")
+    comments = GenericRelation("Comment", related_query_name="comments")
 
     class Meta:
         ordering = ["startv"]

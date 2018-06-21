@@ -7,7 +7,7 @@ class ArchiveIt(ArchiveProject):
         with zipfile.ZipFile(project_file, 'w') as zipped_f:
             current_take = 0
             for file in location_list:
-                zipped_f.write(file["conv"], file["conv"].replace(root_dir, ""))
+                zipped_f.write(file["final"], file["final"].replace(root_dir, ""))
 
                 current_take += 1
 
@@ -22,7 +22,7 @@ class ArchiveIt(ArchiveProject):
                         'lang_name': project["lang_name"],
                         'book_slug': project["book_slug"],
                         'book_name': project["book_name"],
-                        'result': file["fn"]
+                        'result': file["fname"]
                     })
                     update_progress(*new_task_args)
 
