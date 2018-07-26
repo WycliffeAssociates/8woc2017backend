@@ -89,12 +89,13 @@ class UserViewSet(viewsets.ModelViewSet):
         if "name_audio" not in data or data["name_audio"].strip() == "":
             return Response({"error": "empty_name_audio"}, status=status.HTTP_400_BAD_REQUEST)
 
-        uuid_name = str(uuid.uuid1())[:8]
+        uuid_name = str(uuid.uuid1())
+        username = uuid_name[:8]
         name_audio_location = self.create_name_audio(data["name_audio"], uuid_name)
 
         if name_audio_location is not None:
             if not User.objects.filter(icon_hash=data["icon_hash"]).exists():
-                user = self.create_user(data["icon_hash"], uuid_name, name_audio_location)
+                user = self.create_user(data["icon_hash"], username, name_audio_location)
                 if user is not None:
                     token, created = Token.objects.get_or_create(user=user)
 
@@ -116,7 +117,7 @@ class UserViewSet(viewsets.ModelViewSet):
         data = request.data
 
         if "name_audio" in data:
-            uuid_name = str(uuid.uuid1())[:8]
+            uuid_name = str(uuid.uuid1())
             name_audio_location = self.create_name_audio(data["name_audio"], uuid_name)
 
             if name_audio_location is not None:
@@ -138,7 +139,7 @@ class UserViewSet(viewsets.ModelViewSet):
         nameaudios_folder = os.path.join(
             settings.BASE_DIR, "media", "dump", "name_audios")
         nameaudio_location = os.path.join(nameaudios_folder, uuid_name)
-        relpath = FileUtility.relative_path(nameaudio_location) + ".mp3"
+        relpath = FileUtility.relative_path(nameaudio_location)
 
         if not os.path.exists(nameaudios_folder):
             os.makedirs(nameaudios_folder)
@@ -148,7 +149,7 @@ class UserViewSet(viewsets.ModelViewSet):
             with open(nameaudio_location + '.webm', 'wb') as audio_file:
                 audio_file.write(name)
             sound = pydub.AudioSegment.from_file(nameaudio_location + '.webm')
-            sound.export(nameaudio_location + ".mp3", format='mp3')
+            sound.export(nameaudio_location, format='mp3')
             os.remove(nameaudio_location + ".webm")
         except Exception:
             if os.path.isfile(nameaudio_location + '.webm'):
@@ -157,11 +158,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return relpath
 
-    def create_user(self, icon_hash, uuid_name, name_audio):
+    def create_user(self, icon_hash, username, name_audio):
         password = make_password("P@ssw0rd")
         user = User.objects.create(
             icon_hash=icon_hash,
-            username=uuid_name,
+            username=username,
             password=password,
             name_audio=name_audio
         )

@@ -8,7 +8,7 @@ cur_path = os.path.dirname(__file__)
 file_path = os.path.join(cur_path, "test_files", "zip", "abc.wav")
 
 
-class ZipApiTest(TestCase):
+class ExportApiTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.lang = Language.objects.create(
@@ -55,7 +55,7 @@ class ZipApiTest(TestCase):
     #TODO: Review test to better understand what it does, and how to get it to
     # work
     # def test_download_zip_mp3_has_status_200_OK(self):
-        # response = self.client.get('/api/zip/?id=1&file_format=mp3/')
+        # response = self.client.get('/api/export/?id=1&file_format=mp3/')
         # self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     #TODO: Review test to better understand what it does, and how to get it to
@@ -63,7 +63,7 @@ class ZipApiTest(TestCase):
     # def test_download_zip_mp3_with_invalid_id_has_status_404_Not_Found(self):
         # # gives list of range error
 
-        # response = self.client.get('/api/zip/?id=2&file_format=mp3/')
+        # response = self.client.get('/api/export/?id=2&file_format=mp3/')
         # self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def tearDown(self):

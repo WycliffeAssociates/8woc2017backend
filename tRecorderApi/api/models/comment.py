@@ -52,3 +52,20 @@ class Comment(models.Model):
                 for cmt in comment:
                     take_comment_list.append(cmt)
         return take_comment_list
+
+    @staticmethod
+    def import_comment(comment, comment_type, object_id, user):
+        # Create Comment in database if it's not there
+        if comment_type == 'chapter':
+            q_obj = Chapter.objects.get(pk=object_id)
+        elif comment_type == 'chunk':
+            q_obj = Chunk.objects.get(pk=object_id)
+        elif comment_type == 'take':
+            q_obj = Take.objects.get(pk=object_id)
+        Comment.objects.get_or_create(
+            defaults={
+                'content_object': q_obj
+            },
+            location=comment["location"],
+            owner=user
+        )

@@ -31,7 +31,7 @@ from rest_framework.response import Response
         )
     ]
 ))
-class ZipViewSet(viewsets.ReadOnlyModelViewSet):
+class TransferViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Take.objects.all()
     serializer_class = TakeForZipSerializer
     authentication_classes = (TokenAuthentication,)
@@ -49,50 +49,33 @@ class ZipViewSet(viewsets.ReadOnlyModelViewSet):
             id = kwargs.get("pk", None)
 
         if len(chapters) > 0:
-            takes = Take.objects.filter(chunk__chapter__in=chapters)
+            takes = Take.objects.filter(chunk__chapter__in=chapters) \
+                .order_by('chunk__chapter__number', 'chunk__startv')
         else:
-            takes = Take.objects.filter(chunk__chapter__project=id)
+            takes = Take.objects.filter(chunk__chapter__project=id) \
+                .order_by('chunk__chapter__number', 'chunk__startv')
 
         if len(takes) > 0:
-            language_slug = takes[0].chunk.chapter.project.language.slug
-            language_name = takes[0].chunk.chapter.project.language.name
-            book_slug = takes[0].chunk.chapter.project.book.slug
-            book_name = takes[0].chunk.chapter.project.book.name
-            version_slug = takes[0].chunk.chapter.project.version.slug
+            mode_type = "MULTI" if takes[0].chunk.chapter.project.mode.unit == 1 else "SINGLE"
+
             project = {
-                "lang_slug": language_slug,
-                "lang_name": language_name,
-                "book_slug": book_slug,
-                "book_name": book_name,
-                "ver_slug": version_slug
+                "lang_slug": takes[0].chunk.chapter.project.language.slug,
+                "lang_name": takes[0].chunk.chapter.project.language.name,
+                "book_slug": takes[0].chunk.chapter.project.book.slug,
+                "book_name": takes[0].chunk.chapter.project.book.name,
+                "book_number": takes[0].chunk.chapter.project.book.number,
+                "version_slug": takes[0].chunk.chapter.project.version.slug,
+                "version_name": takes[0].chunk.chapter.project.version.name,
+                "anthology_slug": takes[0].chunk.chapter.project.anthology.slug,
+                "anthology_name": takes[0].chunk.chapter.project.anthology.name,
+                "mode_slug": takes[0].chunk.chapter.project.mode.slug,
+                "mode_name": takes[0].chunk.chapter.project.mode.name,
+                "mode_type": mode_type
             }
 
             zip_it = Download(ArchiveIt(), AudioUtility(), FileUtility())
 
-            root_dir = zip_it.file_utility.root_dir(['media', 'export'])
-            take_location_list = []
-            take_names_list = []
-            for take in takes:
-                file_name = zip_it.file_utility.file_name(take.location)
-                if file_name in take_names_list:
-                    continue
-
-                take_names_list.append(file_name)
-
-                location = {
-                    "fn": file_name,
-                    "src": take.location,
-                    "dst": zip_it.file_utility.create_path(
-                        root_dir,
-                        language_slug,
-                        version_slug,
-                        book_slug,
-                        str(take.chunk.chapter).zfill(2))
-                }
-                take_location_list.append(location)
-
-            task_id = zip_it.download(project, take_location_list, root_dir, file_format, request.user)
+            task_id = zip_it.download(project, takes, file_format, request.user)
             return Response({"response": "processing", "task_id": task_id}, status=202)
         else:
             return Response({"response": "no_takes_in_project"}, status=200)
-

@@ -6,6 +6,8 @@ import shutil
 import subprocess
 import time
 import uuid
+from collections import MutableMapping
+from contextlib import suppress
 
 from django.contrib.auth.hashers import make_password
 
@@ -19,6 +21,8 @@ from api.models.mode import Mode
 from api.models.project import Project
 from api.models.version import Version
 from api.models.user import User
+
+from api.models import Comment
 
 logger = logging.getLogger(__name__)
 
@@ -53,11 +57,6 @@ class FileUtility:
             os.makedirs(root_directory)
         return root_directory
 
-    @staticmethod
-    def copy_files_from_src_to_dest(location_list):
-        for location in location_list:
-            shutil.copy2(location["src"], location["dst"])
-
     def import_project(self, directory, user, update_progress, task_args):
         bad_files = []
         project_manifest = self.open_manifest_file(directory)
@@ -66,8 +65,16 @@ class FileUtility:
         book = Book.import_book(project_manifest["book"], anthology)
         version = Version.import_version(project_manifest["version"])
         mode = Mode.import_mode(project_manifest["mode"])
+        if "users" in project_manifest:
+            users_info = project_manifest["users"]
         project = Project.import_project(
             version, mode, anthology, language, book)
+
+        if not os.path.exists(os.path.join("media", "dump", "comments")):
+            os.makedirs(os.path.join("media", "dump", "comments"))
+
+        if not os.path.exists(os.path.join("media", "dump", "name_audios")):
+            os.makedirs(os.path.join("media", "dump", "name_audios"))
 
         total_takes = self.manifest_takes_count(project_manifest["manifest"])
         takes_added = 0
@@ -77,13 +84,34 @@ class FileUtility:
             number = chapters["chapter"]
             checking_level = chapters["checking_level"]
             chapter = Chapter.import_chapter(project, number, checking_level)
-
+            if "comments" in chapters:
+                comments = chapters["comments"]
+                if len(comments) > 0:
+                    for comment in comments:
+                        comt_path = os.path.join(directory, FileUtility.file_name(comment["location"]))
+                        owner = None
+                        if os.path.exists(comt_path):
+                    	    os.rename(comt_path, comment["location"])
+                        if "users" in project_manifest and "user_id" in comment:
+                            owner = self.manifest_take_owner(project_manifest["users"], comment["user_id"], directory)
+                        Comment.import_comment(comment, "chapter", chapter.id, owner)
             for chunks in chapters["chunks"]:
                 startv = chunks["startv"]
                 endv = chunks["endv"]
                 chunk = Chunk.import_chunk(chapter, startv, endv)
-
+                if "comments" in chunks:
+                    comments = chunks["comments"]
+                    if len(comments) > 0:
+                        for comment in comments:
+                            comt_path = os.path.join(directory, FileUtility.file_name(comment["location"]))
+                            owner = None
+                            if os.path.exists(comt_path):
+                            	os.rename(comt_path, comment["location"])
+                            if "users" in project_manifest and "user_id" in comment:
+                                owner = self.manifest_take_owner(project_manifest["users"], comment["user_id"], directory)
+                            Comment.import_comment(comment, "chunk", chunk.id, owner)
                 for take in chunks["takes"]:
+
                     from api.models.take import Take
                     file = os.path.join(directory, take["name"])
                     if not os.path.isfile(file):
@@ -126,7 +154,18 @@ class FileUtility:
                     rating = take["rating"]
                     duration = meta.duration
                     self.push_audio_processing_to_background(file)
-                    Take.import_takes(self.relative_path(file), duration, markers, rating, chunk, owner)
+                    take_obj = Take.import_takes(self.relative_path(file), duration, markers, rating, chunk, owner)
+                    if "comments" in take:
+                        comments = take["comments"]
+                        if len(comments) > 0:
+                            for comment in comments:
+                                comt_path = os.path.join(directory, FileUtility.file_name(comment["location"]))
+                                owner = None
+                                if os.path.exists(comt_path):
+                            	    os.rename(comt_path, comment["location"])
+                                if "users" in project_manifest and "user_id" in comment:
+                                    owner = self.manifest_take_owner(project_manifest["users"], comment["user_id"], directory)
+                                Comment.import_comment(comment, "take", take_obj.id, owner)
                     takes_added += 1
 
         add_info = ""
@@ -134,16 +173,16 @@ class FileUtility:
             add_info = 'Bad files: ' + ', '.join(bad_files)
 
         return {
-                'user_icon_hash': user["icon_hash"],
-                'user_name_audio': user["name_audio"],
-                'project_id': project.id,
-                'mode': mode.slug,
-                'lang_slug': project_manifest["language"]["slug"],
-                'lang_name': project_manifest["language"]["name"],
-                'book_slug': project_manifest["book"]["slug"],
-                'book_name': project_manifest["book"]["name"],
-                'result': "Imported {0} files of {1}. {2}".format(takes_added, total_takes, add_info),
-            }
+            'user_icon_hash': user["icon_hash"],
+            'user_name_audio': user["name_audio"],
+            'project_id': project.id,
+            'mode': mode.slug,
+            'lang_slug': project_manifest["language"]["slug"],
+            'lang_name': project_manifest["language"]["name"],
+            'book_slug': project_manifest["book"]["slug"],
+            'book_name': project_manifest["book"]["name"],
+            'result': "Imported {0} files of {1}. {2}".format(takes_added, total_takes, add_info),
+        }
 
     @staticmethod
     def get_markers(meta):
@@ -158,14 +197,176 @@ class FileUtility:
     def open_manifest_file(directory):
         try:
             manifest_path = os.path.join(directory, 'manifest.json')
-            manifest = json.load(open(manifest_path))
-            return manifest
+
+            with open(manifest_path) as manifest_file:
+                manifest = json.load(manifest_file)
+                return manifest
         except Exception as e:
             shutil.rmtree(directory)
             logger.error("Error: ", str(e))
 
+    def generate_manifest_dictionary(self, project, takes):
+        manifest = {
+            "language": {
+                "slug": project["lang_slug"],
+                "name": project["lang_name"]
+            },
+            "book": {
+                "slug": project["book_slug"],
+                "name": project["book_name"],
+                "number": project["book_number"]
+            },
+            "version": {
+                "slug": project["version_slug"],
+                "name": project["version_name"]
+            },
+            "anthology": {
+                "slug": project["anthology_slug"],
+                "name": project["anthology_name"]
+            },
+            "mode": {
+                "slug": project["mode_slug"],
+                "name": project["mode_name"],
+                "type": project["mode_type"]
+            },
+            "users": [],
+            "manifest": []
+        }
+
+        for take in takes:
+            chapter = take.chunk.chapter
+            chunk = take.chunk
+
+            chapter_obj = None
+            chunk_obj = None
+
+            for chapter_dic in manifest["manifest"]:
+                if chapter_dic["chapter"] == chapter.number:
+                    chapter_obj = chapter_dic
+
+                    for chunk_dic in chapter_dic["chunks"]:
+                        if chunk_dic["startv"] == chunk.startv:
+                            chunk_obj = chunk_dic
+
+            take_obj = {
+                "name": self.file_name(take.location),
+                "location": take.location,
+                "rating": take.rating,
+                "published": take.published,
+                "user_id": None if not take.owner else take.owner.id,
+                "comments": []
+            }
+
+            if take_obj["user_id"] and \
+                    not any(dic.get('id', "") == take_obj["user_id"] for dic in manifest["users"]):
+                user_obj = {
+                    "id": take.owner.id,
+                    "icon_hash": take.owner.icon_hash,
+                    "name_audio": self.file_name(take.owner.name_audio),
+                    "location": take.owner.name_audio
+                }
+                manifest["users"].append(user_obj)
+
+            for comment in take.comments.all():
+                comment_obj = {
+                    "name": self.file_name(comment.location),
+                    "location": comment.location,
+                    "user_id": None if not comment.owner else comment.owner.id
+                }
+                take_obj["comments"].append(comment_obj)
+
+                if comment_obj["user_id"] and \
+                        not any(dic.get('id', "") == comment_obj["user_id"] for dic in manifest["users"]):
+                    user_obj = {
+                        "id": comment.owner.id,
+                        "icon_hash": comment.owner.icon_hash,
+                        "name_audio": self.file_name(comment.owner.name_audio),
+                        "location": comment.owner.name_audio
+                    }
+                    manifest["users"].append(user_obj)
+
+            if not chunk_obj:
+                chunk_obj = {
+                    "startv": chunk.startv,
+                    "endv": chunk.endv,
+                    "comments": [],
+                    "takes": [take_obj]
+                }
+
+                for comment in chunk.comments.all():
+                    comment_obj = {
+                        "name": self.file_name(comment.location),
+                        "location": comment.location,
+                        "user_id": None if not comment.owner else comment.owner.id
+                    }
+                    chunk_obj["comments"].append(comment_obj)
+
+                    if comment_obj["user_id"] and \
+                            not any(dic.get('id', "") == comment_obj["user_id"] for dic in manifest["users"]):
+                        user_obj = {
+                            "id": comment.owner.id,
+                            "icon_hash": comment.owner.icon_hash,
+                            "name_audio": self.file_name(comment.owner.name_audio),
+                            "location": comment.owner.name_audio
+                        }
+                        manifest["users"].append(user_obj)
+
+                if chapter_obj:
+                    chapter_obj["chunks"].append(chunk_obj)
+            else:
+                chunk_obj["takes"].append(take_obj)
+
+            if not chapter_obj:
+                chapter_obj = {
+                    "chapter": chapter.number,
+                    "checking_level": chapter.checked_level,
+                    "published": chapter.published,
+                    "chunks": [chunk_obj],
+                    "comments": []
+                }
+
+                for comment in chapter.comments.all():
+                    comment_obj = {
+                        "name": self.file_name(comment.location),
+                        "location": comment.location,
+                        "user_id": 0 if not comment.owner else comment.owner.id
+                    }
+                    chapter_obj["comments"].append(comment_obj)
+
+                    if comment_obj["user_id"] and \
+                            not any(dic.get('id', "") == comment_obj["user_id"] for dic in manifest["users"]):
+                        user_obj = {
+                            "id": comment.owner.id,
+                            "icon_hash": comment.owner.icon_hash,
+                            "name_audio": self.file_name(comment.owner.name_audio),
+                            "location": comment.owner.name_audio
+                        }
+                        manifest["users"].append(user_obj)
+
+                manifest["manifest"].append(chapter_obj)
+
+        return manifest
+
+    @staticmethod
+    def create_manifest_file(directory, manifest):
+        with open(os.path.join(directory, "manifest.json"), 'w') as outfile:
+            json.dump(manifest, outfile)
+
+    def delete_keys_from_dict(self, dictionary, keys):
+        for key in keys:
+            with suppress(KeyError):
+                del dictionary[key]
+        for value in dictionary.values():
+            if isinstance(value, MutableMapping):
+                self.delete_keys_from_dict(value, keys)
+
     @staticmethod
     def manifest_takes_count(manifest):
+        """
+        The number of takes in manifest
+        :param manifest: manifest data
+        :return: Integer
+        """
         takes_count = 0
         for chapters in manifest:
             for chunks in chapters["chunks"]:
@@ -174,6 +375,13 @@ class FileUtility:
         return takes_count
 
     def manifest_take_owner(self, users, user_id, directory):
+        """
+        Get or create user that came from manifest
+        :param users: List of user from manifest
+        :param user_id: User id from manifest
+        :param directory: Path to directory with user audio file
+        :return: User instance
+        """
         owner = None
 
         for user in users:
@@ -187,16 +395,82 @@ class FileUtility:
                     dest_file = os.path.join("media", "dump", "name_audios", user["name_audio"])
                     os.rename(audio_file, dest_file)
 
-                    uuid_name = str(uuid.uuid1())[:8]
+                    username = str(uuid.uuid1())[:8]
                     password = make_password("P@ssw0rd")
                     owner = User.objects.create(
                         icon_hash=user["icon_hash"],
-                        username=uuid_name,
+                        username=username,
                         password=password,
                         name_audio=self.relative_path(dest_file)
                     )
 
         return owner
+
+    def get_project_files(self, directory, manifest):
+        file_location_list = []
+
+        # manifest
+        location = {
+            "type": "manifest",
+            "fname": "manifest.json",
+            "src": os.path.join(directory, "manifest.json"),
+            "dst": directory
+        }
+        file_location_list.append(location)
+
+        # user name audio files
+        for user in manifest["users"]:
+            location = {
+                "type": "user",
+                "fname": user["name_audio"],
+                "src": user["location"],
+                "dst": directory
+            }
+            file_location_list.append(location)
+
+        # chapter comments
+        for chapter in manifest["manifest"]:
+            for comment in chapter["comments"]:
+                location = {
+                    "type": "comment",
+                    "fname": comment["name"],
+                    "src": comment["location"],
+                    "dst": directory
+                }
+                file_location_list.append(location)
+
+            for chunk in chapter["chunks"]:
+                # chunk comments
+                for comment in chunk["comments"]:
+                    location = {
+                        "type": "comment",
+                        "fname": comment["name"],
+                        "src": comment["location"],
+                        "dst": directory
+                    }
+                    file_location_list.append(location)
+
+                for take in chunk["takes"]:
+                    # takes
+                    location = {
+                        "type": "take",
+                        "fname": take["name"],
+                        "src": take["location"],
+                        "dst": directory
+                    }
+                    file_location_list.append(location)
+
+                    # take comments
+                    for comment in take["comments"]:
+                        location = {
+                            "type": "comment",
+                            "fname": comment["name"],
+                            "src": comment["location"],
+                            "dst": directory
+                        }
+                        file_location_list.append(location)
+
+        return file_location_list
 
     @staticmethod
     def push_audio_processing_to_background(take):
@@ -243,9 +517,8 @@ class FileUtility:
 
         return file_transfer.archive_project.archive_in_memory(files_list)
 
-    def create_path(self, root_dir, lang_slug, version, book_slug, chapter_number):
-        path = os.path.join(root_dir, lang_slug, version,
-                            book_slug, chapter_number)
+    def create_path(self, *args):
+        path = os.path.join(*args)
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -284,7 +557,8 @@ class FileUtility:
     def copy_files_from_src_to_dest(self, location_list, project, user, update_progress, task_args):
         current_take = 0
         for location in location_list:
-            shutil.copy2(location["src"], location["dst"])
+            if location["type"] != "manifest":
+                shutil.copy2(location["src"], location["dst"])
 
             current_take += 1
             if project and update_progress and task_args:
@@ -298,7 +572,7 @@ class FileUtility:
                     'lang_name': project["lang_name"],
                     'book_slug': project["book_slug"],
                     'book_name': project["book_name"],
-                    'result': location["fn"]
+                    'result': location["fname"]
                 })
                 update_progress(*new_task_args)
 
@@ -396,7 +670,7 @@ class FileUtility:
                         last_modified_date = datetime.datetime.fromtimestamp(mtime)
                         diff = datetime.datetime.now() - last_modified_date
                         # Include files for deletion older than 24 hours
-                        if diff.seconds > 24*60*60:
+                        if diff.seconds > 24 * 60 * 60:
                             fs_records.append(self.relative_path(filepath))
 
         orphans = frozenset(fs_records).difference(db_records)

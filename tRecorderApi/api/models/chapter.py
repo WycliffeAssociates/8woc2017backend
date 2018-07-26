@@ -15,7 +15,7 @@ class Chapter(models.Model):
         on_delete=models.CASCADE,
         related_name="chapters"
     )
-    comments = GenericRelation("Comment")
+    comments = GenericRelation("Comment", related_query_name="comments")
 
     class Meta:
         ordering = ["number"]
