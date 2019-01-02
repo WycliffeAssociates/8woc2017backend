@@ -21,6 +21,10 @@ from rest_framework.response import Response
             type=openapi.TYPE_INTEGER,
             description="Id of a project",
         ), openapi.Parameter(
+            name='chapters', in_=openapi.IN_PATH,
+            type=openapi.TYPE_ARRAY,
+            description="Filter by chapters",
+        ), openapi.Parameter(
             name='file_format', in_=openapi.IN_QUERY,
             type=openapi.TYPE_STRING,
             description="It can be 'mp3' or 'wav'",
