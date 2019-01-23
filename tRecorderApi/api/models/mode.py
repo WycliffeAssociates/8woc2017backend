@@ -18,7 +18,14 @@ class Mode(models.Model):
     @staticmethod
     def import_mode(mode):
         # Create mode in database if it does not exist
-        mode["type"] = 1 if mode["type"] == "MULTI" else 0
+        if mode["type"] == "MULTI":
+            mode["type"] = 1
+            mode['name'] = "chunk"
+            mode['slug'] = "chunk"
+        else:
+            mode["type"] = 0
+            mode['name'] = "verse"
+            mode['slug'] = "verse"
 
         mode_obj, m_created = Mode.objects.get_or_create(
             name=mode['name'],
