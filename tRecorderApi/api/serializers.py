@@ -177,7 +177,8 @@ class TaskSerializer(serializers.Serializer):
         return instance
         
 class DownloadsSerializer(serializers.Serializer):
-    filename = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    url = serializers.CharField(read_only=True)
 
     def create(self, validated_data):
         return Downloads(filename=None, **validated_data)
