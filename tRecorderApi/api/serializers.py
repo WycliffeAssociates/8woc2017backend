@@ -1,4 +1,4 @@
-from .models import Language, Book, Take, Comment, Chapter, Chunk, Project, Anthology, Version, Mode, Task
+from .models import Language, Book, Take, Comment, Chapter, Chunk, Project, Anthology, Version, Mode, Task, Downloads
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
@@ -170,6 +170,17 @@ class TaskSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
+
+    def update(self, instance, validated_data):
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        return instance
+        
+class DownloadsSerializer(serializers.Serializer):
+    filename = serializers.CharField(read_only=True)
+
+    def create(self, validated_data):
+        return Downloads(filename=None, **validated_data)
 
     def update(self, instance, validated_data):
         for field, value in validated_data.items():

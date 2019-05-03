@@ -10,3 +10,4 @@ from .mode import Mode
 from .comment import Comment
 from .user import User
 from .task import Task
+from .downloads import Downloads

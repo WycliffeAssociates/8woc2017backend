@@ -25,3 +25,4 @@ from .user import UserViewSet
 
 from .clean_orphans import *
 from .task import TaskViewSet
+from .downloads import DownloadsViewSet
