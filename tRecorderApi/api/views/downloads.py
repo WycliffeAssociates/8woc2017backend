@@ -30,7 +30,8 @@ class DownloadsViewSet(viewsets.ViewSet):
                 if item == ".gitignore":
                     continue
                 download = Downloads()
-                download.filename = os.path.join("/", self.directory, item)
+                download.name = item
+                download.url = os.path.join(self.directory, item)
                 files.append(download)
         return files
         
