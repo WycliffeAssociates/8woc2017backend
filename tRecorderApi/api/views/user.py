@@ -83,6 +83,10 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request):
 
         data = request.data
+        is_social = False
+        
+        if "is_social" in data and data["is_social"]:
+            is_social = True
 
         if "icon_hash" not in data or data["icon_hash"].strip() == "":
             return Response({"error": "empty_icon_hash"}, status=status.HTTP_400_BAD_REQUEST)
@@ -95,7 +99,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         if name_audio_location is not None:
             if not User.objects.filter(icon_hash=data["icon_hash"]).exists():
-                user = self.create_user(data["icon_hash"], username, name_audio_location)
+                user = self.create_user(data["icon_hash"], username, name_audio_location, is_social)
                 if user is not None:
                     token, created = Token.objects.get_or_create(user=user)
 
@@ -158,13 +162,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return relpath
 
-    def create_user(self, icon_hash, username, name_audio):
+    def create_user(self, icon_hash, username, name_audio, is_social):
         password = make_password("P@ssw0rd")
         user = User.objects.create(
             icon_hash=icon_hash,
             username=username,
             password=password,
-            name_audio=name_audio
+            name_audio=name_audio,
+            is_social=is_social
         )
 
         return user
