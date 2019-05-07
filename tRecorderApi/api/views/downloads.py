@@ -27,8 +27,6 @@ class DownloadsViewSet(viewsets.ViewSet):
         for item in contents:
             candidate = os.path.join(directory, item)
             if os.path.isfile(candidate):
-                if item == ".gitignore":
-                    continue
                 download = Downloads()
                 download.name = item
                 download.url = os.path.join(self.directory, item)

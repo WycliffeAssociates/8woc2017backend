@@ -175,7 +175,8 @@ class TaskSerializer(serializers.Serializer):
         for field, value in validated_data.items():
             setattr(instance, field, value)
         return instance
-        
+
+
 class DownloadsSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
     url = serializers.CharField(read_only=True)
