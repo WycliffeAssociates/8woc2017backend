@@ -1,7 +1,7 @@
 gunicorn==19.7
 pydub
 gevent
-django==1.11
+django==1.11.28
 django_rest_framework
 django-cors-headers
 coreapi
